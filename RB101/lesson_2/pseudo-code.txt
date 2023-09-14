@@ -1,0 +1,89 @@
+* A method that returns the sum of two integers.
+
+  -Casual Pseudo-code:
+    Given 2 integers
+    Assign their sum into a new variable and return the variable 
+  -Formal Pseudo-code:
+    START
+    # Given integers num1 and num2
+    SET sum = num1 + num2
+    RETURN sum  
+    END
+
+* A method that takes an array of strings, and returns a string that is all those strings concatenated together.
+
+  -Casual Pseudo-code:
+    Given 1 array of strings
+    Assign the sum of its elements into a new variable and return the variable
+  -Formal Pseudo-code:
+    START
+    # Given 1 array arr
+    SET concatenated_elements = method inject with ':+' on arr
+    RETURN concatenated_elements
+    END
+
+* A method that takes an array of integers, and returns a new array with every other element from the original array, starting with the first element.
+
+  -Casual Pseudo-code:
+    Given 1 array 
+    Initialize empty array called other_elements
+    Iterate through the array 
+      If the iteration counter is not odd, push respective array element into other_elements
+    Return other_elements
+  -Formal Pseudo-code:
+    START
+    # Given a collection of integers called 'integers'
+    SET other_elements = 0
+    FROM 0 UP TO integers size - 1
+      IF iterator is not odd
+        PUSH element of integers from current iteration into other_elements 
+    RETURN other_elements
+    END
+
+* A method that determines the index of the 3rd occurrence of a given character in a string. For instance, if the given character is 'x' and the string is 'axbxcdxex', the method should return 6 (the index of the 3rd 'x'). If the given character does not occur at least 3 times, return nil.
+
+  -Casual Pseudo-code: 
+    Given 1 string and a given character
+    Initialize counter to zero
+    Initialize answer to nil
+    Iterate through characters of string
+      Compare current character to given character
+        If they match, increase counter by 1
+      Check if counter is 3
+        If so, store current iterator in answer and break iteration
+    Return answer 
+  -Formal Pseudo-code:
+    START 
+    # Given string 'str' and character 'char'
+    SET count = zero
+    SET answer = nil
+    SET iterator = zero
+    FOR value IN str.SPLIT('') 
+      SET count += 1 IF value = char 
+      SET iterator += 1
+      IF count = 3
+        SET answer = iterator
+        BREAK
+    RETURN answer
+    END
+
+* A method that takes two arrays of numbers and returns the result of merging the arrays. The elements of the first array should become the elements at the even indexes of the returned array, while the elements of the second array should become the elements at the odd indexes.
+
+  -Casual Pseudo-code:
+    Given 2 arrays, 1 & 2
+    Initialize empty array called merged_arrays
+    Iterate from 0 to array 1 length - 1
+      Push iteration element from array 1 into merged_arrays
+      Push iteration element from array 2 into merged_arrays
+    Return merged_arrays
+  -Formal Pseudo-code:
+    START 
+    # Given array_1 and array_2
+    SET merged_arrays = []
+    FROM 0 UP TO array_1.length - 1
+      PUSH array_1 element at current iteration into merged_arrays
+      PUSH array_2 element at current iteration into merged_arrays
+    RETURN merged_arrays
+    END
+    
+
