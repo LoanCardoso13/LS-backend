@@ -1,6 +1,6 @@
 welcome: "Welcome to Calculator! Please enter your name: "
 valid_name: "Make sure to use a valid name."
-greeting: Have fun using our calculator!"
+greeting: "Have fun using our calculator!"
 first_number: "What's the first number?"
 second_number: "What's the second number?"
 valid_number: "Hmmmm... That doesn't look like a valid number."
