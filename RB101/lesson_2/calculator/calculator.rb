@@ -23,7 +23,7 @@ def prompt(phrase)
 end
 
 def valid_number?(num)
-  num == '0' || num == '0.0' || num.to_f != 0
+  num == '0' || num == '0.0' || num.to_i != 0
 end
 
 prompt KEYS['welcome']
@@ -88,11 +88,11 @@ loop do
       number1.to_f / number2.to_f
     end
 
-  prompt KEYS[lang]['result'] + " " + result.to_s
+  prompt KEYS[lang]['result'] + " #{result}"
 
   prompt KEYS[lang]['repeat']
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt KEYS[lang]['thanks'] + " " + name + "!"
+prompt KEYS[lang]['thanks'] + " #{name}!"

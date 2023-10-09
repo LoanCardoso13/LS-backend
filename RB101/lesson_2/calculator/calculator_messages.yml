@@ -1,5 +1,9 @@
-welcome: "Welcome to the calculator! Type [en] for English.\n=> Bem-vindo(a) à calculadora! Digite [pt] para Português."
-valid_lang: "Please type what's in between the brackets. Type [en] for English.\n=> Por favor digite o que está entre colchetes. Digite [pt] para Português."
+welcome: |
+  Welcome to the calculator! Type [en] for English.
+  => Bem-vindo(a) à calculadora! Digite [pt] para Português.
+valid_lang: |
+  Please type what's in between the brackets. Type [en] for English.
+  => Por favor digite o que está entre colchetes. Digite [pt] para Português.
 
 en:
   name: "Please enter your name: "
