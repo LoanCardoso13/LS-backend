@@ -1,15 +1,20 @@
+require 'yaml'
+# require 'pry'
+KEYS = YAML.load_file('calculator_messages.yml')
+# binding.pry
 OPERATORS = %w(1 2 3 4)
+LANGUAGES = ['en', 'pt']
 
 def operation_to_message(choice, num1, num2)
   case choice
   when '1'
-    "Adding #{num1} to #{num2}..."
+    "#{num1} + #{num2}..."
   when '2'
-    "Subtracting #{num2} from #{num1}..."
+    "#{num1} - #{num2}..."
   when '3'
-    "Multiplying #{num1} and #{num2}..."
+    "#{num1} * #{num2}..."
   when '4'
-    "Dividing #{num1} by #{num2}..."
+    "#{num1} / #{num2}..."
   end
 end
 
@@ -21,51 +26,51 @@ def valid_number?(num)
   num == '0' || num == '0.0' || num.to_f != 0
 end
 
-prompt 'Welcome to the calculator!'
+prompt KEYS['welcome']
+lang = ''
+loop do
+  lang = gets.chomp.downcase
+  break if LANGUAGES.include?(lang)
+
+  prompt KEYS['valid_lang']
+end
 
 name = ''
 loop do
-  prompt 'Please enter your name: '
+  prompt KEYS[lang]['name']
   name = gets.chomp
   break unless name.strip.empty?
 
-  prompt "Sorry, names can't be blank..."
+  prompt KEYS[lang]['valid_name']
 end
 
-prompt "Hey #{name}! I hope you enjoy using the calculator!"
+prompt "Hey #{name}! " + KEYS[lang]['greeting']
 loop do
   number1 = ''
   loop do
-    prompt 'Please enter first term of operation: '
+    prompt KEYS[lang]['first_number']
     number1 = gets.chomp
     break if valid_number?(number1)
 
-    prompt 'Not a valid number...'
+    prompt KEYS[lang]['valid_number']
   end
 
   number2 = ''
   loop do
-    prompt 'Please enter second term of operation: '
+    prompt KEYS[lang]['second_number']
     number2 = gets.chomp
     break if valid_number?(number2)
 
-    prompt 'Not a valid number...'
+    prompt KEYS[lang]['valid_number']
   end
 
   operator = ''
-  operator_prompt = <<-OPERATION_MESSAGE
-  What operation would you like to perform?
-    1) Addition
-    2) Subtraction
-    3) Multiplication
-    4) Division
-  OPERATION_MESSAGE
   loop do
-    prompt operator_prompt
+    prompt KEYS[lang]['operator_prompt']
     operator = gets.chomp
     break if OPERATORS.include?(operator)
 
-    prompt 'Please, choose either 1, 2, 3 or 4.'
+    prompt KEYS[lang]['valid_operator']
   end
 
   prompt operation_to_message(operator, number1, number2)
@@ -83,11 +88,11 @@ loop do
       number1.to_f / number2.to_f
     end
 
-  prompt "The result is #{result}"
+  prompt KEYS[lang]['result'] + " " + result.to_s
 
-  prompt 'Any more calculations to perform? (Y/n)'
+  prompt KEYS[lang]['repeat']
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt "Thank you for using the calculator #{name}!"
+prompt KEYS[lang]['thanks'] + " " + name + "!"
