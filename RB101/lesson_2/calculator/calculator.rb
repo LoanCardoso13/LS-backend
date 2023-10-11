@@ -1,7 +1,6 @@
 require 'yaml'
 # require 'pry'
 KEYS = YAML.load_file('calculator_messages.yml')
-# binding.pry
 OPERATORS = %w(1 2 3 4)
 LANGUAGES = ['en', 'pt']
 
@@ -22,8 +21,17 @@ def prompt(phrase)
   puts "=> #{phrase}"
 end
 
+def integer?(str)
+  str.to_i.to_s == str
+end
+
+def float?(str)
+  str.prepend('0') if str.start_with?('.')
+  str.to_f.to_s == str
+end
+
 def valid_number?(num)
-  num == '0' || num == '0.0' || num.to_i != 0
+  integer?(num) || float?(num)
 end
 
 prompt KEYS['welcome']
