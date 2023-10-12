@@ -1,77 +1,143 @@
 require 'yaml'
+# require 'pry'
 MESSAGES = YAML.load_file('./loan_messages.yml')
+LANGUAGES = ['en', 'pt']
 
-def prompt(message)
+def prompt(message, alt_lang: false)
+  puts("#{' ' * 80} [en/pt]") if alt_lang == true
   puts "=> #{message}"
 end
 
-def valid?(num)
-  num.to_i != 0 || # Check if string is made of number, not text
-    num == '0' || # Include edge case (1) when user enters zero
-    num == '0.0' # Include edge case (2) when user enters zero.zero
+def loan_bar(principal, total)
+  bar_size = 80
+  number_of_hashes = ((bar_size / total) * principal).to_i
+  ('#' * number_of_hashes) + ('-' * (bar_size - number_of_hashes))
+end
+
+def positive_integer?(str)
+  str.to_i.to_s == str && str.to_i > 0
+end
+
+def positive_float?(str)
+  str.prepend('0') if str.start_with?('.')
+  str.to_f.to_s == str && str.to_f >= 0
+end
+
+def valid_number?(num)
+  (positive_integer?(num) || positive_float?(num))
+end
+
+prompt MESSAGES['welcome']
+lang = ''
+loop do
+  lang = gets.chomp.downcase
+  break if LANGUAGES.include?(lang)
+
+  prompt MESSAGES['valid_lang']
 end
 
 name = ''
-prompt MESSAGES['welcome']
 loop do
+  prompt MESSAGES[lang]['name'], alt_lang: true
   name = gets.chomp
 
-  if name.empty?
-    prompt MESSAGES['valid_name']
+  if LANGUAGES.include?(name.downcase)
+    lang = name.downcase
+    next
+  elsif name.empty?
+    prompt MESSAGES[lang]['valid_name']
   else
     break
   end
 end
-prompt "G'day #{name}! " + MESSAGES['greeting']
+name.capitalize!
+prompt MESSAGES[lang]['greeting'] + "#{name}."
 
 loop do
   amount = ''
   loop do
-    prompt MESSAGES['loan_amount']
+    prompt MESSAGES[lang]['mortgage_amount'], alt_lang: true
     amount = gets.chomp
 
-    if valid?(amount)
+    if LANGUAGES.include?(amount.downcase)
+      lang = amount.downcase
+      next
+    elsif positive_integer?(amount)
       break
     else
-      prompt MESSAGES['valid_number']
+      prompt MESSAGES[lang]['valid_integer']
     end
   end
 
   annual_rate = ''
   loop do
-    prompt MESSAGES['APR']
+    prompt MESSAGES[lang]['APR'], alt_lang: true
     annual_rate = gets.chomp
 
-    if valid?(annual_rate) && annual_rate.to_f >= 0
+    if LANGUAGES.include?(annual_rate.downcase)
+      lang = annual_rate.downcase
+      next
+    elsif valid_number?(annual_rate)
       break
     else
-      prompt MESSAGES['valid_number']
+      prompt MESSAGES[lang]['valid_rate']
     end
   end
 
   yearly_duration = ''
   loop do
-    prompt MESSAGES['duration']
+    prompt MESSAGES[lang]['duration_years'], alt_lang: true
     yearly_duration = gets.chomp
 
-    if valid?(yearly_duration) && yearly_duration.to_f >= 0
+    if LANGUAGES.include?(yearly_duration.downcase)
+      lang = yearly_duration.downcase
+      next
+    elsif positive_integer?(yearly_duration)
       break
     else
-      prompt MESSAGES['valid_number']
+      prompt MESSAGES[lang]['valid_integer']
+    end
+  end
+
+  monthly_duration = ''
+  loop do
+    prompt MESSAGES[lang]['duration_months'], alt_lang: true
+    monthly_duration = gets.chomp
+
+    if LANGUAGES.include?(monthly_duration.downcase)
+      lang = monthly_duration.downcase
+      next
+    elsif monthly_duration == '' || monthly_duration == '0'
+      monthly_duration = 0
+      break
+    elsif positive_integer?(monthly_duration)
+      break
+    else
+      prompt MESSAGES[lang]['valid_integer']
     end
   end
 
   # Converting parameters from yearly to monthly, for use in the equation.
   monthly_rate = (annual_rate.to_f / 12) / 100
-  monthly_duration = yearly_duration.to_i * 12
+  months = (yearly_duration.to_i * 12) + monthly_duration.to_i
   # Core calculator equation.
-  monthly_payment = amount.to_f * (monthly_rate / (1 - ((1 + monthly_rate)**(-monthly_duration))))
+  monthly_payment =
+    amount.to_f * (monthly_rate / (1 - ((1 + monthly_rate)**(-months))))
+  # Total payment calculation for illustration purposes
+  total_paid = monthly_payment * months
 
-  prompt "You'll be paying $#{monthly_payment.round(2)} for #{monthly_duration} months. Your monthly interest rate is #{(monthly_rate * 100).round(2)}%."
+  puts(MESSAGES[lang]['you_pay'] +
+  "$#{monthly_payment.round(2)} " +
+  MESSAGES[lang]['for'] + "#{months} " +
+  MESSAGES[lang]['months'] +
+  " #{(monthly_rate * 100).round(2)}%")
+  puts loan_bar(amount.to_f, total_paid)
+  puts MESSAGES[lang]['legend']
 
-  prompt MESSAGES['repeat']
+  puts
+  prompt MESSAGES[lang]['repeat']
   answer = gets.chomp
   break unless answer.downcase.start_with? 'y'
 end
 
-prompt MESSAGES['thanks']
+prompt MESSAGES[lang]['thanks'] + "#{name}!"

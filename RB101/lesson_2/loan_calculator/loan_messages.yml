@@ -1,9 +1,39 @@
-welcome: "Welcome to the loan calculator! Please enter your name: "
-valid_name: "Make sure to use a valid name."
-greeting: "I hope this calculator suits your needs."
-loan_amount: "Please enter loan amount: "
-APR: "Please enter the Annual Percentage Rate (APR): "
-duration: "Please enter the loan duration in years: "
-valid_number: "Make sure you enter a valid, positive number."
-repeat: "Do you wanna continue using the calculator? ( Y to calculate again )"
-thanks: "Thank you for using the loan calculator!"
+welcome: |
+  Welcome to the calculator! Type [en] for English.
+  => Bem-vindo(a) à calculadora! Digite [pt] para Português.
+valid_lang: |
+  Please type what's in between the brackets. Type [en] for English.
+  => Por favor digite o que está entre colchetes. Digite [pt] para Português.
+
+en:
+  name: "Please enter your name: "
+  valid_name: "Make sure to use a valid name."
+  greeting: "I hope this calculator suits your needs "
+  mortgage_amount: "Please enter mortgage amount: "
+  APR: "Please enter the Annual Percentage Rate (APR): "
+  duration_years: "Please enter the mortgage duration in years: "
+  duration_months: "Please enter the remaining mortgage duration in months, if any: "
+  valid_integer: "Make sure you enter a valid, positive, whole number."
+  valid_rate: "When borrowing, we pay back more than what we got, not less or equal."
+  you_pay: "You'll be paying "
+  for: "for "
+  months: "months, at a monthly interest rate of "
+  legend: "Principal: [#]    Interest: [-]"
+  repeat: "Do you want to continue using the mortgage calculator? ( Y to calculate again )"
+  thanks: "Thank you for using the mortgage calculator "
+pt:
+  name: "Por favor digite o seu nome: "
+  valid_name: "Nome inválido."
+  greeting: "Espero que esta calculadora atenda aos seus anseios "
+  mortgage_amount: "Por favor, entre com o valor total da hipoteca: "
+  APR: "Entre com a taxa de juros anual da hipoteca (em %): "
+  duration_years: "Entre com a duração da hipoteca em anos: "
+  duration_months: "Entre com o restante da duração da hipoteca em meses, caso haja: "
+  valid_integer: "Para ser válido o número precisa ser positivo e inteiro."
+  valid_rate: "Ao tomar um empréstimo, devolve-se mais do que foi emprestado, não menos e nem o mesmo tanto."
+  you_pay: "Você estará pagando "
+  for: "por "
+  months: "meses, a uma taxa de juros mensal de "
+  legend: "Principal: [#]    Juros: [-]"
+  repeat: "Gostaria de continuar a usar a calculadora hipotetecária? ( Y para continuar )"
+  thanks: "Obrigado por utilizar a calculadora hipotetecária "
