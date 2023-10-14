@@ -1,8 +1,6 @@
 require 'yaml'
 # require 'pry'
 KEYS = YAML.load_file('calculator_messages.yml')
-OPERATORS = %w(1 2 3 4)
-LANGUAGES = ['en', 'pt']
 
 def operation_to_message(choice, num1, num2)
   case choice
@@ -14,6 +12,19 @@ def operation_to_message(choice, num1, num2)
     "#{num1} * #{num2}..."
   when '4'
     "#{num1} / #{num2}..."
+  end
+end
+
+def calculation(op, num1, num2)
+  case op
+  when '1'
+    num1.to_f + num2.to_f
+  when '2'
+    num1.to_f - num2.to_f
+  when '3'
+    num1.to_f * num2.to_f
+  when '4'
+    num1.to_f / num2.to_f
   end
 end
 
@@ -38,7 +49,7 @@ prompt KEYS['welcome']
 lang = ''
 loop do
   lang = gets.chomp.downcase
-  break if LANGUAGES.include?(lang)
+  break if KEYS.include?(lang)
 
   prompt KEYS['valid_lang']
 end
@@ -52,7 +63,7 @@ loop do
   prompt KEYS[lang]['valid_name']
 end
 
-prompt "Hey #{name}! " + KEYS[lang]['greeting']
+prompt format(KEYS[lang]['greeting'], name)
 loop do
   number1 = ''
   loop do
@@ -76,7 +87,7 @@ loop do
   loop do
     prompt KEYS[lang]['operator_prompt']
     operator = gets.chomp
-    break if OPERATORS.include?(operator)
+    break if %w(1 2 3 4).include?(operator)
 
     prompt KEYS[lang]['valid_operator']
   end
@@ -84,23 +95,13 @@ loop do
   prompt operation_to_message(operator, number1, number2)
   sleep 0.8
 
-  result =
-    case operator
-    when '1'
-      number1.to_f + number2.to_f
-    when '2'
-      number1.to_f - number2.to_f
-    when '3'
-      number1.to_f * number2.to_f
-    when '4'
-      number1.to_f / number2.to_f
-    end
+  result = calculation(operator, number1, number2)
 
-  prompt KEYS[lang]['result'] + " #{result}"
+  prompt format(KEYS[lang]['result'], result)
 
   prompt KEYS[lang]['repeat']
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt KEYS[lang]['thanks'] + " #{name}!"
+prompt format(KEYS[lang]['thanks'], name)

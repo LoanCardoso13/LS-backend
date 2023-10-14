@@ -8,7 +8,7 @@ valid_lang: |
 en:
   name: "Please enter your name: "
   valid_name: "Make sure to use a valid name."
-  greeting: "Have fun using our calculator!"
+  greeting: "Hey %s! Have fun using our calculator!"
   first_number: "What's the first number?"
   second_number: "What's the second number?"
   valid_number: "Hmmmm... That doesn't look like a valid number."
@@ -19,13 +19,13 @@ en:
       3) Multiplication
       4) Division
   valid_operator: "Must choose: (1), (2), (3) or (4)!!!"
-  result: "The result is: "
+  result: "The result is: %f"
   repeat: "Do you want to perform another calculation? (Y to calculate again)"
-  thanks: "Thank you for using the calculator!"
+  thanks: "Thank you for using the calculator %s!"
 pt:
   name: "Por favor digite o seu nome: "
   valid_name: "Nome inválido."
-  greeting: "Divirta-se com a nossa calculatora!"
+  greeting: "Olá %s! Divirta-se com a nossa calculatora!"
   first_number: "Qual o primeiro número?"
   second_number: "Qual o segundo número?"
   valid_number: "Hmmmm... Este não foi um número válido."
@@ -36,6 +36,6 @@ pt:
       3) Multiplicação
       4) Divisão
   valid_operator: "Tem que escolher entre: (1), (2), (3) ou (4)!!!"
-  result: "O resultado é: "
+  result: "O resultado é: %f"
   repeat: "Gostaria de continuar usando a calculadora? (Y para continuar)"
-  thanks: "Obrigado por usar a calculadora"
+  thanks: "Obrigado por usar a calculadora %s!"
