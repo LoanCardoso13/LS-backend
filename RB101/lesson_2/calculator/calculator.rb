@@ -45,6 +45,16 @@ def valid_number?(num)
   integer?(num) || float?(num)
 end
 
+def get_number(num_choice, lang)
+  loop do
+    prompt KEYS[lang][num_choice]
+    num = gets.chomp
+    return num if valid_number?(num)
+
+    prompt KEYS[lang]['valid_number']
+  end
+end
+
 prompt KEYS['welcome']
 lang = ''
 loop do
@@ -65,23 +75,9 @@ end
 
 prompt format(KEYS[lang]['greeting'], name)
 loop do
-  number1 = ''
-  loop do
-    prompt KEYS[lang]['first_number']
-    number1 = gets.chomp
-    break if valid_number?(number1)
+  number1 = get_number('first_number', lang)
 
-    prompt KEYS[lang]['valid_number']
-  end
-
-  number2 = ''
-  loop do
-    prompt KEYS[lang]['second_number']
-    number2 = gets.chomp
-    break if valid_number?(number2)
-
-    prompt KEYS[lang]['valid_number']
-  end
+  number2 = get_number('second_number', lang)
 
   operator = ''
   loop do
