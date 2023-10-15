@@ -1,7 +1,6 @@
 require 'yaml'
 # require 'pry'
 MESSAGES = YAML.load_file('./loan_messages.yml')
-LANGUAGES = ['en', 'pt']
 
 def prompt(message, alt_lang: false)
   puts("#{' ' * 80} [en/pt]") if alt_lang == true
@@ -31,7 +30,7 @@ prompt MESSAGES['welcome']
 lang = ''
 loop do
   lang = gets.chomp.downcase
-  break if LANGUAGES.include?(lang)
+  break if MESSAGES.include?(lang)
 
   prompt MESSAGES['valid_lang']
 end
@@ -41,7 +40,7 @@ loop do
   prompt MESSAGES[lang]['name'], alt_lang: true
   name = gets.chomp
 
-  if LANGUAGES.include?(name.downcase)
+  if MESSAGES.include?(name.downcase)
     lang = name.downcase
     next
   elsif name.empty?
@@ -51,7 +50,7 @@ loop do
   end
 end
 name.capitalize!
-prompt MESSAGES[lang]['greeting'] + "#{name}."
+prompt format(MESSAGES[lang]['greeting'], name)
 
 loop do
   amount = ''
@@ -59,7 +58,7 @@ loop do
     prompt MESSAGES[lang]['mortgage_amount'], alt_lang: true
     amount = gets.chomp
 
-    if LANGUAGES.include?(amount.downcase)
+    if MESSAGES.include?(amount.downcase)
       lang = amount.downcase
       next
     elsif positive_integer?(amount)
@@ -74,7 +73,7 @@ loop do
     prompt MESSAGES[lang]['APR'], alt_lang: true
     annual_rate = gets.chomp
 
-    if LANGUAGES.include?(annual_rate.downcase)
+    if MESSAGES.include?(annual_rate.downcase)
       lang = annual_rate.downcase
       next
     elsif valid_number?(annual_rate)
@@ -89,7 +88,7 @@ loop do
     prompt MESSAGES[lang]['duration_years'], alt_lang: true
     yearly_duration = gets.chomp
 
-    if LANGUAGES.include?(yearly_duration.downcase)
+    if MESSAGES.include?(yearly_duration.downcase)
       lang = yearly_duration.downcase
       next
     elsif positive_integer?(yearly_duration)
@@ -104,7 +103,7 @@ loop do
     prompt MESSAGES[lang]['duration_months'], alt_lang: true
     monthly_duration = gets.chomp
 
-    if LANGUAGES.include?(monthly_duration.downcase)
+    if MESSAGES.include?(monthly_duration.downcase)
       lang = monthly_duration.downcase
       next
     elsif monthly_duration == '' || monthly_duration == '0'
@@ -140,4 +139,4 @@ loop do
   break unless answer.downcase.start_with? 'y'
 end
 
-prompt MESSAGES[lang]['thanks'] + "#{name}!"
+prompt format(MESSAGES[lang]['thanks'], name)

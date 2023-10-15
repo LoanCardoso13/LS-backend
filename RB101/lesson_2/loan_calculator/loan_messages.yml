@@ -8,7 +8,7 @@ valid_lang: |
 en:
   name: "Please enter your name: "
   valid_name: "Make sure to use a valid name."
-  greeting: "I hope this calculator suits your needs "
+  greeting: "I hope this calculator suits your needs %s"
   mortgage_amount: "Please enter mortgage amount: "
   APR: "Please enter the Annual Percentage Rate (APR): "
   duration_years: "Please enter the mortgage duration in years: "
@@ -20,11 +20,11 @@ en:
   months: "months, at a monthly interest rate of "
   legend: "Principal: [#]    Interest: [-]"
   repeat: "Do you want to continue using the mortgage calculator? ( Y to calculate again )"
-  thanks: "Thank you for using the mortgage calculator "
+  thanks: "Thank you for using the mortgage calculator %s"
 pt:
   name: "Por favor digite o seu nome: "
   valid_name: "Nome inválido."
-  greeting: "Espero que esta calculadora atenda aos seus anseios "
+  greeting: "Espero que esta calculadora atenda aos seus anseios %s"
   mortgage_amount: "Por favor, entre com o valor total da hipoteca: "
   APR: "Entre com a taxa de juros anual da hipoteca (em %): "
   duration_years: "Entre com a duração da hipoteca em anos: "
@@ -36,4 +36,4 @@ pt:
   months: "meses, a uma taxa de juros mensal de "
   legend: "Principal: [#]    Juros: [-]"
   repeat: "Gostaria de continuar a usar a calculadora hipotetecária? ( Y para continuar )"
-  thanks: "Obrigado por utilizar a calculadora hipotetecária "
+  thanks: "Obrigado por utilizar a calculadora hipotetecária %s"
