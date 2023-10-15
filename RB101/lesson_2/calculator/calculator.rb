@@ -55,23 +55,28 @@ def get_number(num_choice, lang)
   end
 end
 
+def get_word(word_choice, lang='en')
+  loop do
+    user_word = gets.chomp
+    case word_choice
+    when 'language'
+      return user_word if KEYS.include?(user_word)
+      prompt KEYS['valid_lang']
+    when 'name'
+      return user_word unless user_word.strip.empty?
+      prompt KEYS[lang]['valid_name']
+    when 'operand'
+      return user_word if %w(1 2 3 4).include?(user_word)
+      prompt KEYS[lang]['valid_operator']
+    end
+  end
+end
+
 prompt KEYS['welcome']
-lang = ''
-loop do
-  lang = gets.chomp.downcase
-  break if KEYS.include?(lang)
+lang = get_word('language')
 
-  prompt KEYS['valid_lang']
-end
-
-name = ''
-loop do
-  prompt KEYS[lang]['name']
-  name = gets.chomp
-  break unless name.strip.empty?
-
-  prompt KEYS[lang]['valid_name']
-end
+prompt KEYS[lang]['name']
+name = get_word('name', lang)
 
 prompt format(KEYS[lang]['greeting'], name)
 loop do
@@ -79,14 +84,8 @@ loop do
 
   number2 = get_number('second_number', lang)
 
-  operator = ''
-  loop do
-    prompt KEYS[lang]['operator_prompt']
-    operator = gets.chomp
-    break if %w(1 2 3 4).include?(operator)
-
-    prompt KEYS[lang]['valid_operator']
-  end
+  prompt KEYS[lang]['operator_prompt']
+  operator = get_word('operand', lang)
 
   prompt operation_to_message(operator, number1, number2)
   sleep 0.8
