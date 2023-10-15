@@ -10,7 +10,8 @@ end
 def loan_bar(principal, total)
   bar_size = 80
   number_of_hashes = ((bar_size / total) * principal).to_i
-  ('#' * number_of_hashes) + ('-' * (bar_size - number_of_hashes))
+
+  puts ('#' * number_of_hashes) + ('-' * (bar_size - number_of_hashes))
 end
 
 def positive_integer?(str)
@@ -125,12 +126,15 @@ loop do
   # Total payment calculation for illustration purposes
   total_paid = monthly_payment * months
 
-  puts(MESSAGES[lang]['you_pay'] +
-  "$#{monthly_payment.round(2)} " +
-  MESSAGES[lang]['for'] + "#{months} " +
-  MESSAGES[lang]['months'] +
-  " #{(monthly_rate * 100).round(2)}%")
-  puts loan_bar(amount.to_f, total_paid)
+  # puts(MESSAGES[lang]['you_pay'] +
+  # "$#{monthly_payment.round(2)} " +
+  # MESSAGES[lang]['for'] + "#{months} " +
+  # MESSAGES[lang]['months'] +
+  # " #{(monthly_rate * 100).round(2)}%")
+  puts
+  puts format(MESSAGES[lang]['result'], monthly_payment, months,
+              monthly_rate * 100)
+  loan_bar(amount.to_f, total_paid)
   puts MESSAGES[lang]['legend']
 
   puts
