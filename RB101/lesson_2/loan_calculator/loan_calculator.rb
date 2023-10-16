@@ -27,6 +27,16 @@ def valid_number?(num)
   (positive_integer?(num) || positive_float?(num))
 end
 
+# def display_results(monthpay, months, monthrate, amount, total, lang)
+def display_results(*results, lang)
+  puts
+  puts format(MESSAGES[lang]['result'], results[0], results[1],
+              results[2] * 100)
+  loan_bar(results[3].to_f, results[4])
+  puts MESSAGES[lang]['legend']
+  puts
+end
+
 prompt MESSAGES['welcome']
 lang = ''
 loop do
@@ -126,18 +136,9 @@ loop do
   # Total payment calculation for illustration purposes
   total_paid = monthly_payment * months
 
-  # puts(MESSAGES[lang]['you_pay'] +
-  # "$#{monthly_payment.round(2)} " +
-  # MESSAGES[lang]['for'] + "#{months} " +
-  # MESSAGES[lang]['months'] +
-  # " #{(monthly_rate * 100).round(2)}%")
-  puts
-  puts format(MESSAGES[lang]['result'], monthly_payment, months,
-              monthly_rate * 100)
-  loan_bar(amount.to_f, total_paid)
-  puts MESSAGES[lang]['legend']
+  display_results(monthly_payment, months, monthly_rate, amount, total_paid,
+                  lang)
 
-  puts
   prompt MESSAGES[lang]['repeat']
   answer = gets.chomp
   break unless answer.downcase.start_with? 'y'
