@@ -27,7 +27,19 @@ def valid_number?(num)
   (positive_integer?(num) || positive_float?(num))
 end
 
-# def display_results(monthpay, months, monthrate, amount, total, lang)
+def calculations(annual_rate, yearly_duration, monthly_duration, amount)
+  # Converting parameters from yearly to monthly, for use in the core equation.
+  monthly_rate = (annual_rate.to_f / 12) / 100
+  months = (yearly_duration.to_i * 12) + monthly_duration.to_i
+  # Core calculator equation.
+  monthly_payment =
+    amount.to_f * (monthly_rate / (1 - ((1 + monthly_rate)**(-months))))
+  # Total payment calculation, for illustration purposes
+  total_paid = monthly_payment * months
+
+  [monthly_rate, months, monthly_payment, total_paid]
+end
+
 def display_results(*results, lang)
   puts
   puts format(MESSAGES[lang]['result'], results[0], results[1],
@@ -127,14 +139,9 @@ loop do
     end
   end
 
-  # Converting parameters from yearly to monthly, for use in the equation.
-  monthly_rate = (annual_rate.to_f / 12) / 100
-  months = (yearly_duration.to_i * 12) + monthly_duration.to_i
-  # Core calculator equation.
-  monthly_payment =
-    amount.to_f * (monthly_rate / (1 - ((1 + monthly_rate)**(-months))))
-  # Total payment calculation for illustration purposes
-  total_paid = monthly_payment * months
+  *calc_results = calculations(annual_rate, yearly_duration, monthly_duration,
+                               amount)
+  monthly_rate, months, monthly_payment, total_paid = calc_results
 
   display_results(monthly_payment, months, monthly_rate, amount, total_paid,
                   lang)
