@@ -47,6 +47,7 @@ Algorithm:
     Concatenate 'rd' to it 
   Else:
     Concatenate 'th' to it 
+  Change last 2 characters of cent_digts to 'th' if second to last numerical digit is '1'
   Return cent_digits
 
 =end
