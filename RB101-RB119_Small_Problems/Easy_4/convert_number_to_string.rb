@@ -10,7 +10,15 @@ PEDAC
 
 Problem:
 
-
+  input: Integer 
+  output: String corresponding to Integer input
+  rules: 
+    explicit: 
+      - input integer may be positive or zero
+      - no use of built-in conversion
+    implicit:
+      - no left-side zeros
+      - write a method
 
 Examples and test cases:
 
@@ -20,11 +28,19 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Integer to Array conversion. Iteration. Control flow. 
 
 Algorithm:
 
-
+  Define method called integer_to_string with 'int' parameter
+  Initialize variable 'length' to length of 'int'
+  Initialize variable 'current_dec' to zero
+  Initialize variable 'answer' to empty string
+  For length times: 
+    Define iterative parameter 'i'
+    Calculate 'current_dec' to 'int' divided by 10 to the power of 'length - 'i' + 1 modulus 10
+    Case 'current_dec' is equal to any of the 10 possible digits, append the corresponding digit in string format to 'answer' 
+  Return 'answer'
 
 =end
 

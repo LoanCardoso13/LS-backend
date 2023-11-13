@@ -12,7 +12,13 @@ PEDAC
 
 Problem:
 
-
+  input: String
+  output: Integer from input  
+  rules: 
+    explicit: 
+      - numeric input may contain trailing + or - sign
+      - no use of built-in methods for conversion 
+      - write a method
 
 Examples and test cases:
 
@@ -22,11 +28,18 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Control flow - conditional. Use of previous, user-defined method.
 
 Algorithm:
 
-
+  Require string_to_integer 
+  Define method called string_to_signed_integer with parameter 'str'
+  Write if expression with 'str' first character is equal to minus as condition
+    Use remaining characters of 'str' as argument to string_to_integer and multiply by -1
+  Else, if 'str' first character is equal to plus 
+    Use remaining characters of 'str' as argument to string_to_integer
+  Else 
+    Use all characters of 'str' as argument to string_to_integer
 
 =end
 

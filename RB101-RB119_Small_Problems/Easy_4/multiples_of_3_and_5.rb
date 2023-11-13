@@ -9,7 +9,12 @@ PEDAC
 
 Problem:
 
-
+  input: Integer
+  output: Integer sum of multiples of 3 or 5 of given input
+  rules: 
+    Explicit: 
+      - input is Integer greater than 1
+      - write a method
 
 Examples and test cases:
 
@@ -20,11 +25,18 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Iteration + Control flow.
 
 Algorithm:
 
-
+  Define method called multisum with parameter 'num'
+  Initialize empty array called 'arr'.
+  Iterate over 1 until 'num'
+    Define iterative variable called 'i'
+    Push 'i' into 'arr' if cond1 or cond2 is satisfied
+      cond1 is modulus of 'i' by 3 is equal to zero
+      cond2 is modulus of 'i' by 5 is equal to zero
+  Return sum of members of 'arr'
 
 =end
 

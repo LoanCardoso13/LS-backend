@@ -8,7 +8,12 @@ PEDAC
 
 Problem:
 
-
+  input: Integer representing year
+  output: Boolean indicating if year is a leap one or not
+  rules: 
+    explicit: 
+      - input is Integer greater than zero
+      - write a method 
 
 Examples and test cases:
 
@@ -28,10 +33,16 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Control flow - conditionals.
 
 Algorithm:
 
-
+  Define a method called leap_year? with parameter year
+  Write logical expression exp1 && (exp2 || exp3) as follows:
+    exp1 is year modulus by 4 is equal to zero condition
+    exp2 is year modulus by 100 is not equal to zero condition
+    exp3 is year modulus by 400 is equal to zero condition 
 
 =end
+
+

@@ -12,7 +12,13 @@ PEDAC
 
 Problem:
 
-
+  input: String
+  output: Integer from input  
+  rules: 
+    explicit: 
+      - only numeric characters in input 
+      - no use of built-in methods for conversion 
+      - write a method
 
 Examples and test cases:
 
@@ -21,11 +27,18 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Iteration and Control Flow.
 
 Algorithm:
 
-
+  Define a method called string_to_integer with parameter 'str' 
+  Initialize variable 'dec_place' to 1
+  Initialize variable 'answer' to 0
+  Iterate over 'str' from left to right characters
+    Compare character with each string decimal
+      Case it matches, multiply 'dec_place' with corresponding integer decimal and add to 'answer'
+    Assign 'dec_place' to itself multiplied by 10
+  Return 'answer'
 
 =end
 

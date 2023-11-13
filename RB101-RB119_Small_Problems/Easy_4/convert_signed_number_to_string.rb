@@ -10,7 +10,15 @@ PEDAC
 
 Problem:
 
-
+  input: Integer 
+  output: String corresponding to Integer input
+  rules: 
+    explicit: 
+      - no use of built-in conversion
+      - positive integers should may contain plus sign on output
+    implicit:
+      - no left-side zeros
+      - write a method
 
 Examples and test cases:
 
@@ -20,11 +28,19 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Require user defined method from previous exercise. Control flow - condition.
 
 Algorithm:
 
-
+  Require integer_to_string
+  Define method called signed_integer_to_string that has 'int' parameter
+  Initialize variable 'is_negative'? to false
+  Initialize variable 'answer' to empty string
+  If 'int' less than zero: 
+    Assign 'int' to itself multiplied by -1 
+    Assign 'is_negative?' to true 
+  Assign return value of integer_to_string method call with 'int' as argument to 'answer' variable
+  Prepend 'answer' with minus sign if 'is_negative?' is true
 
 =end
 

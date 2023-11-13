@@ -8,7 +8,14 @@ PEDAC
 
 Problem:
 
-
+  input: Array of numbers
+  output: Array with the running totals of input Array
+  rules: 
+    Explicit: 
+      - write a method
+    Implicit: 
+      - elements of input array are Integers
+      - input can be empty array
 
 Examples and test cases:
 
@@ -19,11 +26,17 @@ Examples and test cases:
 
 Data Structure:
 
-
+  Iteration. 
 
 Algorithm:
 
-
+  Define method called running_total with parameter 'arr'
+  Initialize variable 'sum' to zero
+  Initialize variable 'answer' to empty array
+  Iterate over elements of 'arr'
+    Assign 'sum' to itself plus current element
+    Push 'sum' value to 'answer' array
+  Return 'answer'
 
 =end
 
