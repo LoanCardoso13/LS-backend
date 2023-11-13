@@ -1,23 +1,23 @@
 =begin
 
-Write a metod that takes two strings as arguments, determines the longest of the two strings, and then returns the result of concatenating the shorter string, the longer string, and the shorter string once again. You may assume that the strings are of different lengths.
+  Write a metod that takes two strings as arguments, determines the longest of the two strings, and then returns the result of concatenating the shorter string, the longer string, and the shorter string once again. You may assume that the strings are of different lengths.
 
 PEDAC
 
 Problem:
 
-input: two String arguments
-output: concatenation of strings like shortlongshort
-rules:
-  explicit: strings have different lengths. 
-  implicit: String can be empty
-            always 2 arguments are given
+  input: two String arguments
+  output: concatenation of strings like shortlongshort
+  rules:
+    explicit: strings have different lengths. 
+    implicit: String can be empty
+              always 2 arguments are given
 
 Examples and test cases:
 
-short_long_short('abc', 'defgh') == "abcdefghabc"
-short_long_short('abcde', 'fgh') == "fghabcdefgh"
-short_long_short('', 'xyz') == "xyz"
+  short_long_short('abc', 'defgh') == "abcdefghabc"
+  short_long_short('abcde', 'fgh') == "fghabcdefgh"
+  short_long_short('', 'xyz') == "xyz"
 
 Data structure:
 

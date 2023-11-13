@@ -1,21 +1,21 @@
 =begin
   
-Write a method that takes a year as input and returns the century. The return value should be a string that begins with the century number, and ends with st, nd, rd, or th as appropriate for that number.
+  Write a method that takes a year as input and returns the century. The return value should be a string that begins with the century number, and ends with st, nd, rd, or th as appropriate for that number.
 
-New centuries begin in years that end with 01. So, the years 1901-2000 comprise the 20th century.
+  New centuries begin in years that end with 01. So, the years 1901-2000 comprise the 20th century.
 
 PEDAC
 
 Problem:
 
-input: Integer corresponding to year
-output: String corresponding to century of input year
-rules: 
-  Explicit: 
-  - input is Integer
-  - output is String
-  Implicit:
-  - all years are A.D.
+  input: Integer corresponding to year
+  output: String corresponding to century of input year
+  rules: 
+    Explicit: 
+    - input is Integer
+    - output is String
+    Implicit:
+    - all years are A.D.
 
 Example and test cases:
 
