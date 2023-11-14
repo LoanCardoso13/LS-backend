@@ -38,10 +38,46 @@ Algorithm:
   Initialize variable 'answer' to empty string
   For length times: 
     Define iterative parameter 'i'
-    Calculate 'current_dec' to 'int' divided by 10 to the power of 'length - 'i' + 1 modulus 10
+    Calculate 'current_dec' to 'int' divided by 10 to the power of 'length - 'i' - 1 modulus 10
     Case 'current_dec' is equal to any of the 10 possible digits, append the corresponding digit in string format to 'answer' 
   Return 'answer'
 
 =end
+
+def integer_to_string(int)
+  length = int.digits.length
+  current_dec = 0
+  answer = ''
+  length.times do |i|
+    current_dec = (int / (10**(length - i - 1))) % 10
+    case current_dec
+    when 0 
+      answer << '0'
+    when 1 
+      answer << '1'
+    when 2 
+      answer << '2'
+    when 3 
+      answer << '3'
+    when 4 
+      answer << '4'
+    when 5 
+      answer << '5'
+    when 6 
+      answer << '6'
+    when 7 
+      answer << '7'
+    when 8 
+      answer << '8'
+    when 9 
+      answer << '9'
+    end
+  end
+  answer
+end
+
+puts integer_to_string(4321) == '4321'
+puts integer_to_string(0) == '0'
+puts integer_to_string(5000) == '5000'
 
 

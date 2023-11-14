@@ -34,12 +34,46 @@ Algorithm:
   Define a method called string_to_integer with parameter 'str' 
   Initialize variable 'dec_place' to 1
   Initialize variable 'answer' to 0
-  Iterate over 'str' from left to right characters
+  Iterate over 'str' from right to left characters
     Compare character with each string decimal
       Case it matches, multiply 'dec_place' with corresponding integer decimal and add to 'answer'
     Assign 'dec_place' to itself multiplied by 10
   Return 'answer'
 
 =end
+
+def string_to_integer(str)
+  dec_place = 1
+  answer = 0
+  str.reverse.each_char do |char|
+    case char
+    when '2'
+      answer += dec_place * 2
+    when '3'
+      answer += dec_place * 3
+    when '4'
+      answer += dec_place * 4
+    when '5'
+      answer += dec_place * 5
+    when '6'
+      answer += dec_place * 6
+    when '7'
+      answer += dec_place * 7
+    when '8'
+      answer += dec_place * 8
+    when '9'
+      answer += dec_place * 9
+    when '0'
+      answer += dec_place * 0
+    when '1'
+      answer += dec_place * 1
+    end
+    dec_place *= 10
+  end
+  answer
+end
+
+puts string_to_integer('4321') == 4321
+puts string_to_integer('570') == 570
 
 

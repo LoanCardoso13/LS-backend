@@ -34,14 +34,38 @@ Algorithm:
 
   Require integer_to_string
   Define method called signed_integer_to_string that has 'int' parameter
-  Initialize variable 'is_negative'? to false
   Initialize variable 'answer' to empty string
   If 'int' less than zero: 
     Assign 'int' to itself multiplied by -1 
-    Assign 'is_negative?' to true 
-  Assign return value of integer_to_string method call with 'int' as argument to 'answer' variable
-  Prepend 'answer' with minus sign if 'is_negative?' is true
+    Assign return value of integer_to_string method call with 'int' as argument to 'answer' variable
+    Prepend 'answer' with minus sign if 'is_negative?' is true
+  Elsif 'int' greater than zero: 
+    Assign return value of integer_to_string method call with 'int' as argument to 'answer' variable
+    Prepend 'answer' with plus sign if 'is_negative?' is true
+  Else
+    Assign return value of integer_to_string method call with 'int' as argument to 'answer' variable
+  Return 'answer'
 
 =end
 
+require './convert_number_to_string.rb'
+
+def signed_integer_to_string(int)
+  answer = ''
+  if int < 0
+    int *= -1
+    answer = integer_to_string(int)
+    answer.prepend('-') 
+  elsif int > 0
+    answer = integer_to_string(int)
+    answer.prepend('+')
+  else 
+    answer = integer_to_string(int)
+  end
+  answer
+end
+
+puts signed_integer_to_string(4321) == '+4321'
+puts signed_integer_to_string(-123) == '-123'
+puts signed_integer_to_string(0) == '0'
 
