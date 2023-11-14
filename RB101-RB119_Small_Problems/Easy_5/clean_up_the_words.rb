@@ -7,12 +7,26 @@ PEDAC
 
 Problem: 
 
+        input: String with alphabetic and non-alphabetic characters 
+        output: String with non-alphabetic characters reduced to single space
+        rules: 
+          explicit: 
+            - write a method
+            - input is all lower cased
+          implicit: 
+            - input have multiple words
+
 Examples and test cases:
 
 	cleanup("---what's my +*& line?") == ' what s my line '
 
 Data structure:
 
+        String methods.
+
 Algorithm:
+
+        Define method called cleanup with 'str' parameter
+
 
 =end
