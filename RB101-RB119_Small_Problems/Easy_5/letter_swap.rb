@@ -40,3 +40,18 @@ Algorithm:
         Join 'arr2' with spaces into string and return it 
 
 =end
+
+def swap(str)
+  arr = str.split(' ')
+  arr.each do |word|
+    first_char = word[0]
+    last_char = word[-1]
+    word[0]= last_char
+    word[-1]= first_char
+  end
+  arr.join(' ')
+end
+
+puts swap('Oh what a wonderful day it is') == 'hO thaw a londerfuw yad ti si'
+puts swap('Abcde') == 'ebcdA'
+puts swap('a') == 'a'

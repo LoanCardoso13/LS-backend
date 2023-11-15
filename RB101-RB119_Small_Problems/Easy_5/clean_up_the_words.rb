@@ -32,10 +32,23 @@ Algorithm:
         Initialize variable 'temp' to empty string
         Iterate over 'str' characters
           define iterative variable as 'char' 
-          push 'char' value onto 'answer' if 'temp' is not a space
+          push 'char' value onto 'answer' if ('temp' is not a space or char is not a space)
           reassign 'temp' to 'char'
         Return 'answer'
 
 =end
 
+def cleanup(str)
+  str.tr!('^a-z^0-9', ' ')
+  p str
+  answer = ''
+  temp = ''
+  str.each_char do |char|
+    answer << char if (temp != ' ' || char != ' ')
+    temp = char
+  end
+  p answer
+end
+
+puts cleanup("---what's my +*& line?") == ' what s my line '
 

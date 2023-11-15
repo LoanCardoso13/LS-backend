@@ -32,7 +32,7 @@ Data structure:
 Algorithm:
 
         Define method called word_sizes with parameter 'str'
-        Initialize variable 'arr' to 'str' value split 
+        Initialize variable 'arr' to 'str' value split by spaces
         Initialize variable 'arr2' to empty array
         Iterate through 'arr' value
           Calculate element length
@@ -42,5 +42,25 @@ Algorithm:
         Transform 'arr2' into a hash and return it 
 
 =end
+
+def word_sizes(str)
+  arr = str.split(' ')
+  arr2 = []
+  arr.each do |element|
+    length = element.length
+    counter = 0
+    arr.each do |element2|
+      counter += 1 if element2.length == length
+    end
+    arr2 << [length, counter]
+  end
+  arr2.uniq!
+  arr2.to_h
+end
+
+puts word_sizes('Four score and seven.') == { 3 => 1, 4 => 1, 5 => 1, 6 => 1 }
+puts word_sizes('Hey diddle diddle, the cat and the fiddle!') == { 3 => 5, 6 => 1, 7 => 2 }
+puts word_sizes("What's up doc?") == { 6 => 1, 2 => 1, 4 => 1 }
+puts word_sizes('') == {}
 
 

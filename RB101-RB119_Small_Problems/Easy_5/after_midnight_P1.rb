@@ -23,6 +23,7 @@ Problem:
             - input integer may be 0, negative or positive
             - input may be more than 12h
             - (assumption) input may NOT be more than 24h
+	      - During implementation this assumption proved wrong
 
 Examples and test cases:
 
@@ -42,19 +43,38 @@ Algorithm:
 
         Define method called time_of_day with parameter 'total_minutes'
         Initialize 'hours' variable to integer division of (absolute) 'total_minutes' by 60
+	Reassign 'hours' to itself modulus 24
         Initialize 'minutes' variable to modulus of (absolute) 'total_minutes' by 60
         Write If expression with 'total_minutes' being greater or equal to zero as condition
           Interpolate conversion of 'hours' to string with 2 digits, with ':' and conversion of 'minutes'
         Else 
-          Reassign 'hours' to 24 minus its value
+          Reassign 'hours' to 23 minus its value
           Reassign 'minutes' to 60 minus its value
+	  Add an hour in case minutes is equal to zero
           Interpolate conversion of 'hours' to string with 2 digits, with ':' and conversion of 'minutes'
 
 =end
 
 def time_of_day(total_minutes)
   hours = total_minutes.abs / 60
+  hours %= 24
   minutes = total_minutes.abs % 60
   if total_minutes >= 0
-    "#{hours}
+    format('%.2d:%.2d', hours, minutes)
+  else 
+    hours = 23 - hours
+    minutes = 60 - minutes
+    hours += 1 if minutes == 0
+    format('%.2d:%.2d', hours, minutes)
+  end
 end
+
+puts time_of_day(0) == "00:00"
+puts time_of_day(-3) == "23:57"
+puts time_of_day(35) == "00:35"
+puts time_of_day(-1437) == "00:03"
+puts time_of_day(3000) == "02:00"
+puts time_of_day(800) == "13:20"
+puts time_of_day(-4231) == "01:29"
+
+

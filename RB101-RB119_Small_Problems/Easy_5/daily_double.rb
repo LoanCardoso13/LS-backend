@@ -40,4 +40,20 @@ Algorithm:
 
 =end
 
+def crunch(str)
+  temp = ''
+  answer = ''
+  str.each_char do |char|
+    answer << char if (char != temp)
+    temp = char
+  end
+  answer
+end
+
+puts crunch('ddaaiillyy ddoouubbllee') == 'daily double'
+puts crunch('4444abcabccba') == '4abcabcba'
+puts crunch('ggggggggggggggg') == 'g'
+puts crunch('a') == 'a'
+puts crunch('') == ''
+
 

@@ -48,4 +48,29 @@ Algorithm:
 
 =end
 
+def get_integers(hours_string)
+  hours = hours_string[0, 2].to_i
+  minutes = hours_string[-2, 2].to_i
+  return hours, minutes
+end
+
+def after_midnight(hours_string)
+  hours, minutes = get_integers(hours_string)
+  hours = 0 if hours == 24
+  return hours * 60 + minutes
+end
+
+def before_midnight(hours_string)
+  hours, minutes = get_integers(hours_string)
+  hours = 24 if ( hours == 0 && minutes == 0 )
+  return (24 - hours)*60 - minutes
+end
+
+puts after_midnight('00:00') == 0
+puts before_midnight('00:00') == 0
+puts after_midnight('12:34') == 754
+puts before_midnight('12:34') == 686
+puts after_midnight('24:00') == 0
+puts before_midnight('24:00') == 0
+
 
