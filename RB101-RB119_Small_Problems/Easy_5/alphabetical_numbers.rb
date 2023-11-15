@@ -8,6 +8,13 @@ PEDAC
 
 Problem: 
 
+        input: Array of Integers
+        output: Integers sorted alphabetically
+        rules: 
+          explicit: 
+            - input integers between 0 and 19
+            - write a method
+
 Examples and test cases:
 
 	alphabetic_number_sort((0..19).to_a) == [
@@ -17,6 +24,15 @@ Examples and test cases:
 
 Data structure:
 
+        Hash as database. String iteration. ASCII value comparison.
+
 Algorithm:
 
-=end
+        Define method called alphabetic_number_sort with 'arr' parameter
+        Create a hash named 'hsh' where keys are integers between 0 and 19 and values are their string representation
+        Use Array#sort with a block and assign its return value to 'answer'
+          define iterative variables as 'pre' and 'post'
+          compare hsh['pre'] to hsh['post']
+       Return 'answer'
+ 
+end

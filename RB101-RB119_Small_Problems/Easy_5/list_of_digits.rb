@@ -6,6 +6,15 @@ PEDAC
 
 Problem: 
 
+        input: Integer
+        output: Array corresponding to digits from input number, preserving order
+        rules: 
+          explicit: 
+            - input always positive
+            - write a method
+          implicit: 
+            - no empty or zero input
+
 Examples and test cases:
 
 	puts digit_list(12345) == [1, 2, 3, 4, 5]     # => true
@@ -15,6 +24,15 @@ Examples and test cases:
 
 Data structure:
 
+        Type conversion. String method.
+
 Algorithm:
 
+        Define method called digit_list with 'int' parameter
+        Initialize 'arr' variable to return value of Call Integer#to_s, then String#split with empty string as argument
+        Iterate over 'arr' with Array#map 
+          Have each element Call String#to_i
+
 =end
+
+

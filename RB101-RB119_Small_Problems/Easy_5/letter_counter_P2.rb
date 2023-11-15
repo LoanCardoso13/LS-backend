@@ -17,4 +17,14 @@ Data structure:
 
 Algorithm:
 
+        Define method called word_sizes with parameter 'str'
+        Initialize variable 'arr' to 'str' value split 
+        Initialize variable 'arr2' to empty array
+        Iterate through 'arr' value
+          Filter out non-alphabetical characters from element
+          Calculate element length
+          Check how many elements in 'arr' have that length
+          Push both the length and the number of elements in 'arr' with that length onto 'arr2' as a 2-element sub array
+        Get rid of repeating elements in 'arr2'
+        Transform 'arr2' into a hash and return it
 =end

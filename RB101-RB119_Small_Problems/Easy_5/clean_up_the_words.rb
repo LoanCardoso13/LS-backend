@@ -27,6 +27,15 @@ Data structure:
 Algorithm:
 
         Define method called cleanup with 'str' parameter
-
+        Use string method to substitute all non-alphanumeric characters of 'str' with space
+        Initialize new variable 'answer' to empty string
+        Initialize variable 'temp' to empty string
+        Iterate over 'str' characters
+          define iterative variable as 'char' 
+          push 'char' value onto 'answer' if 'temp' is not a space
+          reassign 'temp' to 'char'
+        Return 'answer'
 
 =end
+
+

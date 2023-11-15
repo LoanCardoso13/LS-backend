@@ -6,6 +6,16 @@ PEDAC
 
 Problem: 
 
+        input: String
+        output: String without consecutive duplicate character
+        rules: 
+          explicit: 
+            - can't use String#squeeze(!) built in methods
+            - write a method
+            - returns new string, i.e. new object
+          implicit: 
+            - there may be single spaces within string input 
+
 Examples and test cases:
 
 	crunch('ddaaiillyy ddoouubbllee') == 'daily double'
@@ -16,6 +26,18 @@ Examples and test cases:
 
 Data structure:
 
+        String iteration.
+
 Algorithm:
 
+        Define method called crunch with parameter 'str'
+        Initialize 'temp' variable to empty string
+        Initialize 'answer' variable to empty string
+        Iterate over characters of 'str'
+          if character is different from 'temp' value, push it into 'answer' variable
+          reassign 'temp' to character
+        Return 'answer'
+
 =end
+
+
