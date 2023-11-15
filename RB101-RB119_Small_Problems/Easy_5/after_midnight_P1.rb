@@ -52,4 +52,9 @@ Algorithm:
 
 =end
 
-
+def time_of_day(total_minutes)
+  hours = total_minutes.abs / 60
+  minutes = total_minutes.abs % 60
+  if total_minutes >= 0
+    "#{hours}
+end
