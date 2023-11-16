@@ -6,13 +6,11 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: Array of String objects
+	output: Array of String objects without any vowels
 	rules:
 	  explicit:
-	    -
-          implicit:
-	    -
+	    - write a method
 
 Examples and test cases:
 
@@ -22,11 +20,13 @@ Examples and test cases:
 
 Data structure:
 
-	
+        String method with character selector. Array iteration. 
 
 Algorithm:
 
-	
+	Define method called remove_vowels with parameter 'arr'
+        Iterate over 'arr' value
+          Use string destructive method to eliminate vowels from each element of 'arr'
 
 =end
 

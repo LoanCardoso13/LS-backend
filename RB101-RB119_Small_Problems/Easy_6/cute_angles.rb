@@ -14,13 +14,13 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: Integer or Float number representing degrees
+	output: String representing degrees with minutes and seconds notation
 	rules:
 	  explicit:
-	    -
-          implicit:
-	    -
+            - write a method
+            - leading zero must be included for minutes and seconds (always 2 digits)
+            - degree notation given
 
 Examples and test cases:
 
@@ -33,11 +33,16 @@ Examples and test cases:
 
 Data structure:
 
-	
+        String formatting. Control flow. Float operations. 
 
 Algorithm:
 
-	
+        Define a method called dms with parameter 'dg'
+        Initialize variable 'D' to integer part of value from 'dg'
+        Initialize variable 'd' to decimal part of value from 'dg'
+        Calculate 'M' as the integer part of 60*'d'
+        Calculate 'S' as 60 * the decimal part of 60*'d' multiplied by 60 but keep only the first 2 digits
+        Return a string formatted appropriately with 'D', 'M' and 'S' 
 
 =end
 
