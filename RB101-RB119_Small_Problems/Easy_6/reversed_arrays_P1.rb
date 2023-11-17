@@ -9,13 +9,16 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: Array
+	output: same Array object with elements reversed
 	rules:
 	  explicit:
-	    -
+            - may not use built-in reverse method 
+            - write a method
+            - return the same object that was used as argument
           implicit:
-	    -
+	    - array may be composed of different types of elements
+            - array might have 1 or 0 elements
 
 Examples and test cases:
 
@@ -39,11 +42,18 @@ Examples and test cases:
 
 Data structure:
 
-	
+        Array iteration. Array index assignment method. Buffer variables.
 
 Algorithm:
 
-	
+	Define method called reverse! with 'arr' parameter
+        Initialize variable 'i_limit' to 'arr' length divided by 2 (integer division)
+        From 1 up to 'i_limit' do 
+          Define iterative variable as 'i'
+          Assign 'first_element' to 'arr' at index 'i' - 1
+          Assign 'last_element' to 'arr' at index -'i'
+          Use array index assignment to change 'arr' at index 'i' - 1 to 'last_element' value
+          Use array index assignment to change 'arr' at index -'i' to 'first_element' value
 
 =end
 

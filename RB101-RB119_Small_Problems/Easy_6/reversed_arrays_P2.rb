@@ -8,13 +8,17 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: Array
+	output: new Array object with elements of original from input reversed
 	rules:
 	  explicit:
-	    -
+	    - write a method
+            - may not use built in reverse methods
+            - may not use previously written method
+            - must return a new object
+            - must not modify original object
           implicit:
-	    -
+	    - input array may contain different types of elements
 
 Examples and test cases:
 
@@ -31,11 +35,20 @@ Examples and test cases:
 
 Data structure:
 
-	
+        Integer division. Array iteration. Array index assignment. Array sum.
 
 Algorithm:
 
-	
+	Define a method called reverse with argument 'arr'
+        Reassign 'arr' to the result of itself plus empty array
+        Initialize 'i_limit' to result of integer division of 'arr' length by 2
+        From 1 up to 'i_limit' do 
+          Define iterative variable as 'i'
+          Assign 'first_element' to 'arr' element at 'i' - 1 index
+          Assign 'last_element' to 'arr' element at -'i' index
+          Use array indexed assignment to make 'arr' element at 'i' - 1 index point to 'last_element'
+          Use array indexed assignment to make 'arr' element at -'i' index point to 'first_element'
+        Return 'arr'
 
 =end
 
