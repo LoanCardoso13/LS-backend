@@ -6,13 +6,14 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: one Array
+	output: two Arrays with half the elements from each, halves respective of order of argument 
 	rules:
 	  explicit:
-	    -
+	    - write a method
+            - if input array has odd number of elements, the middle elements goes to first output array
           implicit:
-	    -
+	    - if not enough elements to output, returning empty array is valid
 
 Examples and test cases:
 
@@ -23,11 +24,13 @@ Examples and test cases:
 
 Data structure:
 
-	
+        Array methods. Array indexation.
 
 Algorithm:
 
-	
+        Define method called halvsies with paramaters 'arr'
+        Initialize variable 'half' to length of 'arr' divided by 2 then subtracted by 1 if length is even, and just divided by 2 otherwise
+        Build array of two elements, first is 'arr' from range 0 to 'half' and second is 'arr' minus 'arr' from range 0 to 'half'
 
 =end
 

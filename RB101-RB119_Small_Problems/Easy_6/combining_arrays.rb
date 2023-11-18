@@ -6,13 +6,15 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
-	rules:
+	input: two Arrays 
+	output: one Array with all elements from the input Array with no duplication of elements
+	rules: 
 	  explicit:
-	    -
+	    - write a method
+            - output array only have unique elements
           implicit:
-	    -
+	    - the order of the output elements is the same of the input arrays
+            - the order of the arguments is how it should be returned
 
 Examples and test cases:
 
@@ -20,11 +22,13 @@ Examples and test cases:
 
 Data structure:
 
-	
+        Array methods.
 
 Algorithm:
 
-	
+	Define a method called merge with 2 parameters, 'arr1' and 'arr2'
+        Initialize variable 'answer' to merge/join of the arrays (Array#+)
+        Filter out duplicate elements from arrays (Array#uniq) and return it 
 
 =end
 

@@ -6,13 +6,14 @@ PEDAC
 
 Problem:
 
-	input:
-	output:
+	input: Array of unordered Integers
+        output: the only duplicate Integer from the Array input 
 	rules:
 	  explicit:
-	    -
+	    - write a method
+            - there is only 1 duplicate value in the array
           implicit:
-	    -
+            - there are only integers in the array 
 
 Examples and test cases:
 
@@ -30,11 +31,15 @@ Examples and test cases:
 
 Data structure:
 
-	
+        Array iteration. Array methods.
 
 Algorithm:
 
-	
+	Define method called find_dup with 'arr' argument
+        Initialize 'temp_storage' variable pointing to empty array
+        Iterate over elements from 'arr'
+          For each element, check if 'temp_storage' contains the element and, if not, push it to 'temp_storage'
+          If it contains the element, return the element from the function
 
 =end
 
