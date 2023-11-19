@@ -38,12 +38,32 @@ Data structure:
 Algorithm:
 
         Define a method called dms with parameter 'dg'
-        Initialize variable 'D' to integer part of value from 'dg'
+        Initialize variable 'degrees' to integer part of value from 'dg'
         Initialize variable 'd' to decimal part of value from 'dg'
-        Calculate 'M' as the integer part of 60*'d'
-        Calculate 'S' as 60 * the decimal part of 60*'d' multiplied by 60 but keep only the first 2 digits
-        Return a string formatted appropriately with 'D', 'M' and 'S' 
+        Calculate 'minutes' as the integer part of 60*'d'
+        Calculate 'seconds' as 60 * the decimal part of 60*'d' turned into integer
+        Return a string formatted appropriately with 'degrees', 'minutes' and 'seconds' 
 
 =end
 
+DEGREE = "\xC2\xB0"
+
+def dms(dg)
+  degrees = dg.to_i
+  d = dg - degrees
+  minutes = (60*d).to_i
+  seconds = (60*(60*d - minutes))
+  if seconds.round() > seconds 
+    minutes += 1
+    seconds = 0
+  end
+  "#{degrees}#{DEGREE}" + format("%.2d'%.2d\"", minutes, seconds)
+end
+
+puts dms(30) == %(30°00'00")
+puts dms(76.73) == %(76°43'48")
+puts dms(254.6) == %(254°36'00")
+puts dms(93.034773) == %(93°02'05")
+puts dms(0) == %(0°00'00")
+puts dms(360) == %(360°00'00") || dms(360) == %(0°00'00")
 
