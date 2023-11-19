@@ -52,4 +52,21 @@ Algorithm:
 
 =end
 
+def reverse(arr)
+  arr = arr + []
+  i_limit = arr.length / 2
+  1.upto(i_limit) do |i|
+    first_element = arr[i-1]
+    last_element = arr[-i]
+    arr[i-1]= last_element
+    arr[-i]= first_element
+  end
+  return arr
+end
+
+
+puts reverse([1,2,3,4]) == [4,3,2,1]          # => true
+puts reverse(%w(a b e d c)) == %w(c d e b a)  # => true
+puts reverse(['abc']) == ['abc']              # => true
+puts reverse([]) == []                        # => true
 

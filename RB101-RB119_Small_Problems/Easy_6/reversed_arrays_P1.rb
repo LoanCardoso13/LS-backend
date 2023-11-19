@@ -54,7 +54,25 @@ Algorithm:
           Assign 'last_element' to 'arr' at index -'i'
           Use array index assignment to change 'arr' at index 'i' - 1 to 'last_element' value
           Use array index assignment to change 'arr' at index -'i' to 'first_element' value
+	Return 'arr'
 
 =end
 
+def reverse!(arr)
+  i_limit = arr.length / 2
+  1.upto(i_limit) do |i|
+    first_element = arr[i - 1]
+    last_element = arr[-i]
+    arr[i - 1]= last_element
+    arr[-i]= first_element
+  end
+  arr
+end
+
+
+list = [1,2,3,4]
+result = reverse!(list)
+puts result == [4, 3, 2, 1] # true
+puts list == [4, 3, 2, 1] # true
+puts list.object_id == result.object_id # true
 
