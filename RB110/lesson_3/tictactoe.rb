@@ -7,6 +7,7 @@ def prompt(msg)
 end
 
 def display_board(brb)
+  system 'clear'
   puts ' '*5 + '|' + ' '*5 + '|' + ' '*5
   puts ' '*2 + brb[1] + ' '*2 + '|' + ' '*2 + brb[2] + ' '*2 + '|' + ' '*2 + brb[3] + ' '*2
   puts ' '*5 + '|' + ' '*5 + '|' + ' '*5
@@ -29,23 +30,70 @@ def initialize_board
 end 
 
 def empty_squares(brb)
-  brb.keys.reject { |num| brb[num] != ' ' }
+  brb.keys.reject { |num| brb[num] != INITIAL_MARKER }
 end
 
 def player_places_piece(brb)
-  empty_squares = empty_squares(brb)
+  square = 0
   loop do 
-    prompt "please choose a square among #{empty_squares}"
+    prompt "please choose a square (#{empty_squares(brb).join(',')}):"
     square = gets.chomp.to_i
-    brb[square]= PLAYER_MARKER
-    break if empty_squares.include?(square)
+    break if empty_squares(brb).include?(square)
     prompt "Invalid choice, try again."
   end
-  display_board(brb)
+  brb[square]= PLAYER_MARKER
 end
- 
-board = initialize_board
 
-display_board(board)
-player_places_piece(board)
+def computer_places_piece(brb)
+  square = empty_squares(brb).sample
+  brb[square]= COMPUTER_MARKER
+end
 
+def detect_winner(brb)
+  winning_sequences = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                      [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
+                      [[1, 5, 9], [3, 5, 7] ] # diagonals
+  winning_sequences.each do |seq|
+    if brb[seq[0]] == PLAYER_MARKER &&
+       brb[seq[1]] == PLAYER_MARKER &&
+       brb[seq[2]] == PLAYER_MARKER 
+      return 'Player'
+    elsif brb[seq[0]] == COMPUTER_MARKER &&
+	  brb[seq[1]] == COMPUTER_MARKER &&
+	  brb[seq[2]] == COMPUTER_MARKER 
+      return 'Computer'
+    end
+  end
+  false
+end
+
+def someone_win?(brb)
+  !!detect_winner(brb)
+end
+
+def board_full?(brb)
+  empty_squares(brb).empty?
+end
+
+loop do   
+  board = initialize_board
+  loop do
+    display_board(board)
+    player_places_piece(board)
+    break if someone_win?(board) || board_full?(board)
+    display_board(board)
+    computer_places_piece(board)
+    break if someone_win?(board) || board_full?(board)
+  end
+  display_board(board)
+  if someone_win?(board)
+    prompt "#{detect_winner(board)} won!"
+  else
+    prompt "It's a tie..."
+  end
+  prompt "Would you like to play again? (y/n)"
+  answer = gets.chomp
+  break unless answer.downcase.start_with?('y')
+end
+
+prompt "Thanks for playing Tic Tac Toe! Goodbye!"
