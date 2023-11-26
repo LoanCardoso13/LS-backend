@@ -23,9 +23,7 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each do |num|
-    new_board[num]= INITIAL_MARKER
-  end 
+  (1..9).each { |n| new_board[n]= INITIAL_MARKER } 
   new_board
 end 
 
@@ -75,17 +73,19 @@ def board_full?(brb)
   empty_squares(brb).empty?
 end
 
-loop do   
+loop do # main loop (multiple games) 
   board = initialize_board
-  loop do
-    display_board(board)
+  display_board(board)
+  loop do # single game loop
     player_places_piece(board)
-    break if someone_win?(board) || board_full?(board)
     display_board(board)
+    break if someone_win?(board) || board_full?(board)
+    prompt "Running algorithms to calculate optimal move..."
+    sleep(1.5)
     computer_places_piece(board)
+    display_board(board)
     break if someone_win?(board) || board_full?(board)
   end
-  display_board(board)
   if someone_win?(board)
     prompt "#{detect_winner(board)} won!"
   else
@@ -97,3 +97,4 @@ loop do
 end
 
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"
+
