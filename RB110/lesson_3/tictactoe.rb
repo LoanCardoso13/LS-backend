@@ -62,6 +62,8 @@ def player_places_piece(brb)
 end
 
 def computer_places_piece(brb)
+  prompt "Running algorithms to calculate optimal move..."
+  sleep(1.3)
   threats = []
   opportunities = []
   WINNING_SEQUENCES.each do |seq|
@@ -89,6 +91,15 @@ def computer_places_piece(brb)
   brb[square] = COMPUTER_MARKER
 end
 
+def place_piece(who_plays, brb)
+  case who_plays
+  when 'Player'
+    player_places_piece(brb)
+  when 'Computer'
+    computer_places_piece(brb)
+  end
+end
+
 def detect_winner(brb)
   WINNING_SEQUENCES.each do |seq|
     if brb.values_at(*seq).count(PLAYER_MARKER) == 3
@@ -112,19 +123,33 @@ end
 
 score = [0, 0]
 winner = ''
+players = [ 'Player', 'Computer']
+turn = 0
+
+loop do # order of player turn loop
+  system 'clear'
+  puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+  prompt "Who should start?"
+  prompt "(P)layer or (C)omputer?"
+  answer = gets.chomp
+  if answer.downcase.start_with?('c')
+    players.reverse!
+    break
+  else answer.downcase.start_with?('p')
+    break
+  end
+  prompt "Not a valid choice... Please choose either (P)layer or (C)omputer."
+end
 
 loop do # main loop (multiple games)
   board = initialize_board
   display_board(board, score)
   loop do # single game loop
-    player_places_piece(board)
+    current_player = players[turn % 2]
+    place_piece(current_player, board)
     display_board(board, score)
     break if someone_win?(board) || board_full?(board)
-    prompt "Running algorithms to calculate optimal move..."
-    sleep(1.3)
-    computer_places_piece(board)
-    display_board(board, score)
-    break if someone_win?(board) || board_full?(board)
+    turn += 1
   end
   if someone_win?(board)
     winner = detect_winner(board)
