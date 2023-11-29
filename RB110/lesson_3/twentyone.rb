@@ -14,33 +14,16 @@
 
 ranks = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace' ]
 deck = { heart: ranks.dup, diamond: ranks.dup, club: ranks.dup, spades: ranks.dup }
-player = { heart: [], diamond: [], club: [], spades: [] }
-dealer = { heart: [], diamond: [], club: [], spades: [] }
-player_total = 0
-dealer_total = 0
-bust = false
-winner = ''
+score = [0, 0]
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-def accrued_value(card)
-  if (2..10).include?(card)
-    return card
-  elsif card == 'ace'
-    return 1
-  elsif card == 'ace+'
-    return 11
-  else
-    return 10
-  end
-end
-
 def get_total(hand)
   sum = 0
-  hand.values.flatten.each do |card|
-    sum += accrued_value(card)
+  hand.each do |card|
+    sum += card[:value]
   end
   sum
 end
@@ -49,49 +32,79 @@ def give_random_card(hand, deck)
   suit = deck.keys.sample
   rank = deck[suit].sample 
   deck[suit].delete(rank)
-  if rank == 'ace' && get_total(hand) <= 10
-    rank << '+'
+  if (2..10).include?(rank)
+    value = rank
+  elsif rank == 'ace' && get_total(hand) <= 10
+    value = 11
+  elsif rank == 'ace'
+    value = 1
+  else
+    value = 10
   end
-  hand[suit] << rank
-end
-
-if [1, 2].sample == 1 # Deal cards
-  2.times { |_| give_random_card(player, deck); give_random_card(dealer, deck) }
-else
-  2.times { |_| give_random_card(dealer, deck); give_random_card(player, deck) }
+  { suit => rank, value: value }
 end
 
 loop do # Game loop (1 game consists of 2 turns; player's and dealer's, in this order)
-  until bust == true do # Player turn
-    prompt "Dealer has: #{dealer.values.flatten.sample} and unknown card."
-    prompt "You have: #{player.values.flatten.join(' and ')}"
+  player = []
+  dealer = []
+  bust = false
+  winner = ''
+  system 'clear'
+  if [1, 2].sample == 1 # Deal cards 
+    2.times { |_| player << give_random_card(player, deck); dealer << give_random_card(dealer, deck) }
+  else
+    2.times { |_| dealer << give_random_card(dealer, deck); player << give_random_card(player, deck) }
+  end
+  prompt "Welcome to the Twenty-One game!"
+  puts
+  prompt "The goal of Twenty-One is to try to get as close to 21 as possible, without going over."
+  prompt "If you go over 21, it's a 'bust' and you lose."
+  puts
+  prompt "Dealer has: #{dealer.sample[:value]} and unknown card."
+  loop do # Player turn
+    prompt "You have: #{player.map { |hsh| hsh[:value] }.join(' and ')}"
     prompt "(H)it or (S)tay?"
     answer = gets.chomp
     break if answer.downcase.start_with?('s')
-    give_random_card(player, deck)
-    player_total = get_total(player)
-    bust = true if player_total > 21
-  end
-  if bust == true
-    winner = 'dealer'
-    break
+    player << give_random_card(player, deck)
+    prompt "You got a #{player.last[:value]}, your total is now #{get_total(player)}"
+    sleep(5)
+    if get_total(player) > 21
+      prompt "You got 'bust'."
+      winner = 'dealer'
+      bust = true
+      break
+    end
   end
 
-  while dealer_total <= 17 do # Dealer turn
+  while get_total(dealer) < 17 do # Dealer turn
     prompt "Dealer total is less than 17..."
     sleep(1.3)
-    give_random_card(dealer, deck)
-    dealer_total = get_total(dealer)
-    prompt "Dealer now has: #{dealer.values.flatten.join(' and ')}"
-    bust = true if dealer_total > 21
-  end
-  if bust == true
-    winner = 'player'
-    break
+    dealer << give_random_card(dealer, deck)
+    prompt "Dealer received #{dealer.last}"
+    prompt "Dealer now has: #{dealer.map { |hsh| hsh[:value] }.join(' and ')}"
+    sleep(5)
+    break if get_total(dealer) > 17
+    if get_total(dealer) > 21
+      prompt "Dealer got 'bust'."
+      winner = 'player'
+      bust = true
+      break
+    end
   end
 
-  winner = get_total(player) > get_total(dealer) ? 'player' : 'dealer'
+  if bust == false
+    prompt "Both dealer and player have decided to stay, and no one got bust"
+    prompt "It is now time to compare the cards..."
+    prompt "Dealer total is: #{get_total(dealer)}"
+    prompt "Player total is: #{get_total(player)}"
+    winner = get_total(player) > get_total(dealer) ? 'player' : 'dealer'
+  end
+  sleep(5)
+  prompt "The winner is #{winner}."
+  prompt "Play again? (y/n)"
+  answer = gets.chomp
+  break unless answer.downcase.start_with?('y')
 end
 
-prompt "The winner is #{winner}."
-
+prompt "Thank you for playing twenty-one! Goodbye!"
