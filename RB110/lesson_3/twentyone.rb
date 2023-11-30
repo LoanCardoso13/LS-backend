@@ -1,4 +1,4 @@
-RANKS = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace' ]
+RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 score = { Player: 0, Dealer: 0 }
 
 def prompt(msg)
@@ -21,12 +21,12 @@ end
 
 def compare_cards(player, dealer)
   if get_total(player) > get_total(dealer)
-    return 'player'
+    'Player'
   elsif get_total(dealer) > get_total(player)
-    return 'dealer'
+    'Dealer'
   else
     prompt "It's a tie.."
-    return 'tie'
+    'tie'
   end
 end
 
@@ -38,67 +38,79 @@ def get_total(hand)
   sum
 end
 
-def give_random_card(hand, deck)
-  suit = deck.keys.sample
-  rank = deck[suit].sample 
-  deck[suit].delete(rank)
-  if (2..10).include?(rank)
-    value = rank
-  elsif rank == 'ace' && get_total(hand) <= 10
-    value = 11
-  elsif rank == 'ace'
-    value = 1
+def display_cards(hand)
+  if hand.instance_of?(Hash)
+    "#{hand.values[0]} of #{hand.keys[0]}"
   else
-    value = 10
+    arr = hand.map { |card| "#{card.values[0]} of #{card.keys[0]}" }
+    arr[0...(arr.length - 1)].join(', ') + " and #{arr.last}"
   end
-  { suit => rank, value: value }
 end
 
-loop do # Game loop (1 game consists of 2 turns; player's and dealer's, in this order)
+def give_random_card(hand, deck)
+  suit = deck.keys.sample
+  rank = deck[suit].sample
+  deck[suit].delete(rank)
+  value = if (2..10).include?(rank)
+            rank
+          elsif rank == 'ace' && get_total(hand) <= 10
+            11
+          elsif rank == 'ace'
+            1
+          else
+            10
+          end
+  { suit => rank, :value => value }
+end
+
+loop do # Game loop (1 game consists of player and dealer turns)
   deck = { hearts: RANKS.dup, diamonds: RANKS.dup, clubs: RANKS.dup, spades: RANKS.dup } # Reshuffling
   player = []
   dealer = []
   bust = false
   winner = ''
   system 'clear'
-  if [1, 2].sample == 1 # Deal cards 
+
+  if [1, 2].sample == 1 # Deal cards
     2.times { |_| player << give_random_card(player, deck); dealer << give_random_card(dealer, deck) }
   else
     2.times { |_| dealer << give_random_card(dealer, deck); player << give_random_card(player, deck) }
   end
+
   prompt "Welcome to the Twenty-One game!"
   prompt "The goal of Twenty-One is to try to get as close to 21 as possible, without going over."
   prompt "If you go over 21, it's a 'bust' and you lose."
   puts
   prompt "Current score: Player #{score[:Player]} x #{score[:Dealer]} Dealer."
   puts
-  dealer_card = dealer.sample
-  prompt "Dealer has a #{dealer_card.values[0]} of #{dealer_card.keys[0]} (value: #{dealer_card[:value]}) and unknown card."
+  dealer_card = dealer.sample # Sample removed from line below so that it can be taken once only
+  prompt "Dealer has a #{display_cards(dealer_card)} (value: #{dealer_card[:value]}) and unknown card."
+
   loop do # Player turn
-    prompt "You have: #{player.map { |hsh| hsh[:value] }.join(' and ')}"
+    prompt "You have: #{display_cards(player)}. Your total is #{get_total(player)}."
     prompt "(H)it or (S)tay?"
     break if hit_or_stay?
     player << give_random_card(player, deck)
-    prompt "You got a #{player.last[:value]}, your total is now #{get_total(player)}"
+    prompt "You got a #{display_cards(player.last)}."
     sleep(1)
     if get_total(player) > 21
       prompt "You got 'bust'."
-      winner = 'dealer'
+      winner = 'Dealer'
       bust = true
       break
     end
   end
 
-  while get_total(dealer) < 17 && bust == false do # Dealer turn
-    prompt "Dealer total is less than 17 he decides to hit..."
+  while get_total(dealer) < 17 && bust == false # Dealer turn
+    prompt "Dealer total is less than 17, so he decides to hit..."
     sleep(1)
     dealer << give_random_card(dealer, deck)
-    prompt "Dealer received #{dealer.last}"
-    prompt "Dealer now has: #{dealer.map { |hsh| hsh[:value] }.join(' and ')}"
+    prompt "Dealer received #{display_cards(dealer.last)}"
+    prompt "Dealer now has: #{display_cards(dealer)}"
     sleep(1)
     if get_total(dealer) > 21
       prompt "Dealer got 'bust'."
-      winner = 'player'
+      winner = 'Player'
       bust = true
       break
     end
@@ -108,15 +120,17 @@ loop do # Game loop (1 game consists of 2 turns; player's and dealer's, in this 
   if bust == false
     prompt "Dealer also decided to stay."
     prompt "It is now time to compare the cards..."
+    prompt "Dealer has #{display_cards(dealer)}"
     prompt "Dealer total is: #{get_total(dealer)}"
-    prompt "Player total is: #{get_total(player)}"
+    prompt "You have #{display_cards(player)}"
+    prompt "Your total is: #{get_total(player)}"
     winner = compare_cards(player, dealer)
   end
   sleep(1)
   case winner
-  when 'player'
+  when 'Player'
     score[:Player] += 1
-  when 'dealer'
+  when 'Dealer'
     score[:Dealer] += 1
   end
   prompt "The winner is #{winner}." if winner != 'tie'
@@ -125,4 +139,9 @@ loop do # Game loop (1 game consists of 2 turns; player's and dealer's, in this 
   break unless answer.downcase.start_with?('y')
 end
 
+if score.values[0] == score.values[1]
+  prompt "It ended in a tie."
+else
+  prompt "#{score.key(score.values.max)} won!"
+end
 prompt "Thank you for playing twenty-one! Goodbye!"
