@@ -1,0 +1,65 @@
+- Define constants
+
+	SUITS AND RANKS
+
+--- ---
+
+--- Methods Definitions ---
+
+	prompt method
+
+	initialize_deck method
+
+	total value for hand method
+
+	busted? method
+
+	detect_result method
+
+	display_result method
+
+	play_again? method
+
+--- ---
+--- Main Game loop ---
+	
+	Initialize deck and players cards
+
+	Deal cards
+
+	Display
+		Dealer sample card
+		Player cards and total
+	
+	--- Player Loop Turn ---
+
+		Initialize variable for the state of player's turn
+
+		Input validation loop
+			{Hit or Stay?}
+
+		Control flow for player hitting
+
+		Breakout logic dependent on state of player's turn and busted? method call
+	
+	--- ---
+
+	Control flow for busted? method call with player argument
+
+	--- Dealer Loop Turn ---
+
+		Breakout logic if dealer total >= 17
+
+		Flow for dealer hitting
+
+	--- --- 
+
+	Control flow for busted? method call with dealer argument
+
+	Flow for both players staying
+
+	Breakout logic for play_again? method call
+
+--- ---
+
+End of program message
