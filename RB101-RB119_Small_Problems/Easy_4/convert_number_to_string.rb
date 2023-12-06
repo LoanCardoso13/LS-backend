@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
   In the previous two exercises, you developed methods that convert simple numeric strings to signed Integers. In this exercise and the next, you're going to reverse those methods.
@@ -28,52 +29,25 @@ Examples and test cases:
 
 Data Structure:
 
-  Integer to Array conversion. Iteration. Control flow. 
+  Constant hash for mapping. Integer to Array conversion. Iteration. 
 
 Algorithm:
 
-  Define method called integer_to_string with 'int' parameter
-  Initialize variable 'length' to length of 'int'
-  Initialize variable 'current_dec' to zero
-  Initialize variable 'answer' to empty string
-  For length times: 
-    Define iterative parameter 'i'
-    Calculate 'current_dec' to 'int' divided by 10 to the power of 'length - 'i' - 1 modulus 10
-    Case 'current_dec' is equal to any of the 10 possible digits, append the corresponding digit in string format to 'answer' 
-  Return 'answer'
+  
+  Define constant hash with integers keys to respective string values called GET_STR
+  Define method called integer_to_string with int parameter
+  Have int call Integer#digits, chain with Array#reverse, chain with Array#map with block argument and chain with Array#join
+    Define iterative variable i
+    Have GET_STR keyed by i 
 
 =end
 
+GET_STR = { 0 => '0', 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5', 6 => '6', 7=>'7', 8=>'8', 9=>'9' }
+
 def integer_to_string(int)
-  length = int.digits.length
-  current_dec = 0
-  answer = ''
-  length.times do |i|
-    current_dec = (int / (10**(length - i - 1))) % 10
-    case current_dec
-    when 0 
-      answer << '0'
-    when 1 
-      answer << '1'
-    when 2 
-      answer << '2'
-    when 3 
-      answer << '3'
-    when 4 
-      answer << '4'
-    when 5 
-      answer << '5'
-    when 6 
-      answer << '6'
-    when 7 
-      answer << '7'
-    when 8 
-      answer << '8'
-    when 9 
-      answer << '9'
-    end
-  end
-  answer
+  int.digits.reverse.map do |i|
+    GET_STR[i]
+  end.join
 end
 
 puts integer_to_string(4321) == '4321'

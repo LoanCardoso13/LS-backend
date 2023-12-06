@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
 	The time of day can be represented as the number of minutes before or after midnight. If the number of minutes is positive, the time is after midnight. If the number of minutes is negative, the time is before midnight.
@@ -41,32 +42,24 @@ Data structure:
 
 Algorithm:
 
-        Define method called time_of_day with parameter 'total_minutes'
-        Initialize 'hours' variable to integer division of (absolute) 'total_minutes' by 60
-	Reassign 'hours' to itself modulus 24
-        Initialize 'minutes' variable to modulus of (absolute) 'total_minutes' by 60
-        Write If expression with 'total_minutes' being greater or equal to zero as condition
-          Interpolate conversion of 'hours' to string with 2 digits, with ':' and conversion of 'minutes'
-        Else 
-          Reassign 'hours' to 23 minus its value
-          Reassign 'minutes' to 60 minus its value
-	  Add an hour in case minutes is equal to zero
-          Interpolate conversion of 'hours' to string with 2 digits, with ':' and conversion of 'minutes'
+  Define method called time_of_day with parameter: total_minutes
+  Create a loop to transform negative arguments into their corresponding positive
+    If negative, it will add the minutes of a day to itself until it becomes positive
+  Initialize 'hours' variable to integer division of (absolute) 'total_minutes' by 60
+  Reassign 'hours' to itself modulus 24 (for the case of looping through multiple days)
+  Initialize 'minutes' variable to modulus of (absolute) 'total_minutes' by 60
+  Interpolate conversion of 'hours' to string with 2 digits, with ':' and conversion of 'minutes'
 
 =end
 
 def time_of_day(total_minutes)
+  while total_minutes < 0
+    total_minutes += 24*60
+  end
   hours = total_minutes.abs / 60
   hours %= 24
   minutes = total_minutes.abs % 60
-  if total_minutes >= 0
-    format('%.2d:%.2d', hours, minutes)
-  else 
-    hours = 23 - hours
-    minutes = 60 - minutes
-    hours += 1 if minutes == 0
-    format('%.2d:%.2d', hours, minutes)
-  end
+  format('%.2d:%.2d', hours, minutes)
 end
 
 puts time_of_day(0) == "00:00"

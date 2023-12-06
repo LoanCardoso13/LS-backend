@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
 	Given a string of words separated by spaces, write a method that takes this string of words and returns a string in which the first and last letters of every word are swapped.
@@ -42,15 +43,10 @@ Algorithm:
 =end
 
 def swap(str)
-  arr = str.split(' ')
-  arr.each do |word|
-    first_char = word[0]
-    last_char = word[-1]
-    word[0]= last_char
-    word[-1]= first_char
-  end
-  arr.join(' ')
-end
+  str.split.each do |word|
+    word[0], word[-1] = word[-1], word[0]
+  end.join(' ')
+end # This mutates the collection while iterating over it.
 
 puts swap('Oh what a wonderful day it is') == 'hO thaw a londerfuw yad ti si'
 puts swap('Abcde') == 'ebcdA'

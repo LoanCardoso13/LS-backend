@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
 	Given a string that consists of some words (all lowercased) and an assortment of non-alphabetic characters, write a method that returns that string with all of the non-alphabetic characters replaced by spaces. If one or more non-alphabetic characters occur in a row, you should only have one space in the result (the result should never have consecutive spaces).
@@ -27,27 +28,12 @@ Data structure:
 Algorithm:
 
         Define method called cleanup with 'str' parameter
-        Use string method to substitute all non-alphanumeric characters of 'str' with space
-        Initialize new variable 'answer' to empty string
-        Initialize variable 'temp' to empty string
-        Iterate over 'str' characters
-          define iterative variable as 'char' 
-          push 'char' value onto 'answer' if ('temp' is not a space or char is not a space)
-          reassign 'temp' to 'char'
-        Return 'answer'
+        Use string method to substitute all non-alphanumeric characters of 'str' with space and squeeze it
 
 =end
 
 def cleanup(str)
-  str.tr!('^a-z^0-9', ' ')
-  p str
-  answer = ''
-  temp = ''
-  str.each_char do |char|
-    answer << char if (temp != ' ' || char != ' ')
-    temp = char
-  end
-  p answer
+  str.tr_s('^a-z^0-9', ' ')
 end
 
 puts cleanup("---what's my +*& line?") == ' what s my line '

@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
 	Write a method that takes a string with one or more space separated words and returns a hash that shows the number of words of different sizes.
@@ -32,35 +33,19 @@ Data structure:
 Algorithm:
 
         Define method called word_sizes with parameter 'str'
-        Initialize variable 'arr' to 'str' value split by spaces
-        Initialize variable 'arr2' to empty array
-        Iterate through 'arr' value
-          Calculate element length
-          Check how many elements in 'arr' have that length
-          Push both the length and the number of elements in 'arr' with that length onto 'arr2' as a 2-element sub array
-        Get rid of repeating elements in 'arr2'
-        Transform 'arr2' into a hash and return it 
+	Initialize hash called hsh defaulting value to 0 when key not found
+	Iterate through words of str and increase by 1 the value of its sizes as hsh keys
+	Return hsh
 
 =end
 
 def word_sizes(str)
-  arr = str.split(' ')
-  arr2 = []
-  arr.each do |element|
-    length = element.length
-    counter = 0
-    arr.each do |element2|
-      counter += 1 if element2.length == length
-    end
-    arr2 << [length, counter]
-  end
-  arr2.uniq!
-  arr2.to_h
+  hsh = Hash.new(0)
+  str.split.each { |word| hsh[word.size] += 1 }
+  hsh
 end
 
 puts word_sizes('Four score and seven.') == { 3 => 1, 4 => 1, 5 => 1, 6 => 1 }
 puts word_sizes('Hey diddle diddle, the cat and the fiddle!') == { 3 => 5, 6 => 1, 7 => 2 }
 puts word_sizes("What's up doc?") == { 6 => 1, 2 => 1, 4 => 1 }
 puts word_sizes('') == {}
-
-

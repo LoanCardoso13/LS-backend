@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 
 	Write a method that takes an Array of Integers between 0 and 19, and returns an Array of those Integers sorted based on the English words for each number:
@@ -28,17 +29,16 @@ Data structure:
 
 Algorithm:
 
+        Create a constant hash named 'HSH' where keys are integers between 0 and 19 and values are their string representation
         Define method called alphabetic_number_sort with 'arr' parameter
-        Create a hash named 'hsh' where keys are integers between 0 and 19 and values are their string representation
         Use Array#sort with a block and assign its return value to 'answer'
           define iterative variables as 'pre' and 'post'
-          compare hsh['pre'] to hsh['post']
+          compare HSH['pre'] to HSH['post']
        Return 'answer'
  
 =end
 
-def alphabetic_number_sort(arr)
-  hsh = { 0 => "zero", 
+HSH = { 0 => "zero", 
 	  1 => "one", 
 	  2 => "two",
 	  3 => "three", 
@@ -58,10 +58,11 @@ def alphabetic_number_sort(arr)
 	  17 => "seventeen", 
 	  18 => "eighteen", 
 	  19 => "nineteen" }
-  answer = arr.sort do |pre, post|
-    hsh[pre] <=> hsh[post]
+
+def alphabetic_number_sort(arr)
+  arr.sort do |pre, post|
+    HSH[pre] <=> HSH[post]
   end
-  answer
 end
 
 puts alphabetic_number_sort((0..19).to_a) == [
