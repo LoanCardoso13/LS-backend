@@ -47,16 +47,11 @@ Algorithm:
 GET_INT = { '0' => 0, '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9'=> 9 }
 
 def string_to_integer(str)
-  answer = 0
-  dec_place = 0
-  str.reverse.each_char do |char| 
-    answer += 10**dec_place*GET_INT[char]
-    dec_place += 1
-  end
-  answer
+  str.reverse.chars.map.with_index do |char, dec_place|
+     10**dec_place*GET_INT[char]
+  end.sum
 end
 
 puts string_to_integer('4321') == 4321
 puts string_to_integer('570') == 570
-
-
+# refactored: 1

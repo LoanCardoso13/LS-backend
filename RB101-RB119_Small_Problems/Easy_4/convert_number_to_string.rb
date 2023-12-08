@@ -53,5 +53,4 @@ end
 puts integer_to_string(4321) == '4321'
 puts integer_to_string(0) == '0'
 puts integer_to_string(5000) == '5000'
-
-
+# Refactored: 1
