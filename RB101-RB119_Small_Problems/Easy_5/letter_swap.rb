@@ -51,3 +51,4 @@ end # This mutates the collection while iterating over it.
 puts swap('Oh what a wonderful day it is') == 'hO thaw a londerfuw yad ti si'
 puts swap('Abcde') == 'ebcdA'
 puts swap('a') == 'a'
+# Refactored 1

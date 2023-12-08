@@ -41,13 +41,7 @@ Algorithm:
 =end
 
 def crunch(str)
-  temp = ''
-  answer = ''
-  str.each_char do |char|
-    answer << char if (char != temp)
-    temp = char
-  end
-  answer
+	str.chars.map.with_index { |char, i| char unless str[i+1] == char }.join
 end
 
 puts crunch('ddaaiillyy ddoouubbllee') == 'daily double'
@@ -55,5 +49,4 @@ puts crunch('4444abcabccba') == '4abcabcba'
 puts crunch('ggggggggggggggg') == 'g'
 puts crunch('a') == 'a'
 puts crunch('') == ''
-
-
+# Refactored: 1

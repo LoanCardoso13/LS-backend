@@ -42,7 +42,7 @@ Algorithm:
 
 =end
 
-GET_STR = { 0 => '0', 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5', 6 => '6', 7=>'7', 8=>'8', 9=>'9' }
+GET_STR = (0..9).to_a
 
 def integer_to_string(int)
   int.digits.reverse.map do |i|
@@ -53,4 +53,4 @@ end
 puts integer_to_string(4321) == '4321'
 puts integer_to_string(0) == '0'
 puts integer_to_string(5000) == '5000'
-# Refactored: 1
+# Refactored: 2
