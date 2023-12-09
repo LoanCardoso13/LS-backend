@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin 
 
 	Write a method that takes an Array as an argument, and reverses its elements in place; that is, mutate the Array passed into this method. The return value should be the same Array object.
@@ -59,15 +60,21 @@ Algorithm:
 =end
 
 def reverse!(arr)
-  i_limit = arr.length / 2
-  1.upto(i_limit) do |i|
-    first_element = arr[i - 1]
-    last_element = arr[-i]
-    arr[i - 1]= last_element
-    arr[-i]= first_element
-  end
-  arr
+  arr.sort_by! { |number| -arr.index(number) }
 end
+
+# def reverse!(arr)
+  # (arr.length - 1).times { |i| arr << arr.delete_at(-2-i) }
+  # arr
+# end
+
+# def reverse!(arr)
+#   i_limit = arr.length / 2
+#   1.upto(i_limit) do |i|
+#     arr[i - 1], arr[-i] = arr[-i], arr[i - 1]
+#   end
+#   arr
+# end
 
 
 list = [1,2,3,4]
@@ -75,4 +82,15 @@ result = reverse!(list)
 puts result == [4, 3, 2, 1] # true
 puts list == [4, 3, 2, 1] # true
 puts list.object_id == result.object_id # true
+list = %w(a b e d c)
+puts reverse!(list) == ["c", "d", "e", "b", "a"] # true
+puts list == ["c", "d", "e", "b", "a"] # true
 
+list = ['abc']
+puts reverse!(list) == ["abc"] # true
+puts list == ["abc"] # true
+
+list = []
+puts reverse!(list) == [] # true
+puts list == [] # true
+# Refactored: 3

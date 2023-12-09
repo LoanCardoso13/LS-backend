@@ -40,6 +40,10 @@ Algorithm
 
 =end
 
+def word_cap(str) # use a condition to give or take 32, or do nothing, to the ascii value of every character
+
+end
+
 def word_cap(str)
   answer = str.split(' ').map do |word|
     word.downcase!

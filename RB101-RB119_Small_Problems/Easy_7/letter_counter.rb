@@ -41,17 +41,44 @@ Algorithm
 
 =end
 
-def letter_case_count(str)
-  hsh = { lowercase: 0, uppercase: 0, neither: 0 }
-  str.split('').each do |char|
-    hsh[:lowercase] += 1 if char.count('a-z') == 1
-    hsh[:uppercase] += 1 if char.count('A-Z') == 1
-    hsh[:neither] += 1 if char.count('A-Za-z') == 0
-  end
-  hsh
-end
+# def letter_case_count(str)
+#   hsh = { lowercase: 0, uppercase: 0, neither: 0 }
+#   str.codepoints.each_with_object(hsh) do |char_code, hsh|
+#     if char_code < 65
+#       hsh[:neither] += 1
+#     elsif char_code < 97
+#       hsh[:uppercase] += 1
+#     else
+#       hsh[:lowercase] += 1
+#     end
+#   end
+# end
+
+# def letter_case_count(str)
+#   hsh = { lowercase: 0, uppercase: 0, neither: 0 }
+#   str.chars.each_with_object(hsh) do |char, hsh| 
+#     if ('a'..'z').include?(char)
+#       hsh[:lowercase] += 1
+#     elsif ('A'..'Z').include?(char)
+#       hsh[:uppercase] += 1
+#     else
+#       hsh[:neither] += 1
+#     end
+#   end
+# end
+
+ def letter_case_count(str)
+   hsh = { lowercase: 0, uppercase: 0, neither: 0 }
+   
+   hsh[:lowercase] = str.count('a-z') 
+   hsh[:uppercase] = str.count('A-Z')
+   hsh[:neither] = str.count('^A-Z^a-z')
+
+   hsh
+ end
 
 puts letter_case_count('abCdef 123') == { lowercase: 5, uppercase: 1, neither: 4 }
 puts letter_case_count('AbCd +Ef') == { lowercase: 3, uppercase: 3, neither: 2 }
 puts letter_case_count('123') == { lowercase: 0, uppercase: 0, neither: 3 }
 puts letter_case_count('') == { lowercase: 0, uppercase: 0, neither: 0 }
+# Refactored: 1

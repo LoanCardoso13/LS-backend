@@ -39,14 +39,18 @@ Algorithm
 
 =end
 
-def interleave(arr1, arr2)
-  output_arr = []
-  arr1.length.times do |i|
-    output_arr << arr1[i]
-    output_arr << arr2[i]
-  end
-  output_arr
+def interleave(arr1, arr2) # use Array#zip
+  arr1.zip(arr2).flatten
 end
 
-puts interleave([1, 2, 3], ['a', 'b', 'c']) == [1, 'a', 2, 'b', 3, 'c'] # => true
+# def interleave(arr1, arr2)
+#   output_arr = []
+#   arr1.length.times do |i|
+#     output_arr << arr1[i]
+#     output_arr << arr2[i]
+#   end
+#   output_arr
+# end
 
+puts interleave([1, 2, 3], ['a', 'b', 'c']) == [1, 'a', 2, 'b', 3, 'c'] # => true
+# Refactored: 1

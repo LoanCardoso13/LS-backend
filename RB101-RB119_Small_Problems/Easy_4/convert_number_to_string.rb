@@ -42,6 +42,10 @@ Algorithm:
 
 =end
 
+# def integer_to_string(int)
+  # int.digits.reverse.each_with_object([]) { |digit, arr| arr << (digit + 48).chr }.join
+# end
+
 GET_STR = (0..9).to_a
 
 def integer_to_string(int)
@@ -53,4 +57,4 @@ end
 puts integer_to_string(4321) == '4321'
 puts integer_to_string(0) == '0'
 puts integer_to_string(5000) == '5000'
-# Refactored: 2
+# Refactored: 3

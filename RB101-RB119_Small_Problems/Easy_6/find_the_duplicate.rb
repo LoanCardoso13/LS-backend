@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin 
 
 	Given an unordered array and the information that exactly one value in the array occurs twice (every other value occurs exactly once), how would you determine which value occurs twice? Write a method that will find and return the duplicate value that is known to be in the array.
@@ -43,14 +44,24 @@ Algorithm:
 
 =end
 
+# def find_dup(arr)
+#   temp_storage = []
+#   arr.each do |element|
+#     if temp_storage.include?(element)
+#       return element
+#     else
+#       temp_storage << element
+#     end 
+#   end
+# end
+
 def find_dup(arr)
-  temp_storage = []
-  arr.each do |element|
-    if temp_storage.include?(element)
+  arr.each_with_object([]) do | element, new_arr |
+    if new_arr.include?(element)
       return element
     else
-      temp_storage << element
-    end 
+      new_arr << element
+    end
   end
 end
 
@@ -66,4 +77,4 @@ puts find_dup([18,  9, 36, 96, 31, 19, 54, 75, 42, 15,
           85, 87, 51, 17, 66, 20, 28, 26,  2, 22,
           40, 23, 71, 62, 73, 32, 43, 24,  4, 56,
           7,  34, 57, 74, 45, 11, 88, 67,  5, 58]) == 73
-
+# Refactored: 1

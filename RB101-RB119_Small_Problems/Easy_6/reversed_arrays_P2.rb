@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin 
 
 	Write a method that takes an Array, and returns a new Array with the elements of the original list in reverse order. Do not modify the original list.
@@ -52,21 +53,34 @@ Algorithm:
 
 =end
 
+# def reverse(arr)
+  # arr.inject([], :unshift)
+# end
+
 def reverse(arr)
-  arr = arr + []
-  i_limit = arr.length / 2
-  1.upto(i_limit) do |i|
-    first_element = arr[i-1]
-    last_element = arr[-i]
-    arr[i-1]= last_element
-    arr[-i]= first_element
-  end
-  return arr
+  arr.length.times.with_object([]) { |i, new_arr| new_arr << arr[-i-1] } 
 end
 
+# def reverse(arr)
+  # arr.each_with_object([]) { |number, arr| arr.unshift(number) }
+# end
+
+# def reverse(arr)
+#   arr = arr + []
+#   i_limit = arr.length / 2
+#   1.upto(i_limit) do |i|
+#     arr[i - 1], arr[-i] = arr[-i], arr[i - 1]
+#   end
+#    arr
+# end
 
 puts reverse([1,2,3,4]) == [4,3,2,1]          # => true
 puts reverse(%w(a b e d c)) == %w(c d e b a)  # => true
 puts reverse(['abc']) == ['abc']              # => true
 puts reverse([]) == []                        # => true
-
+list = [1, 3, 2]                      # => [1, 3, 2]
+new_list = reverse(list)              # => [2, 3, 1]
+puts list.object_id != new_list.object_id  # => true
+puts list == [1, 3, 2]                     # => true
+puts new_list == [2, 3, 1]                 # => true
+# Refactored: 4
