@@ -9,11 +9,14 @@ PEDAC
 
 Problem:
 
-  input:
-  output:
+  input: Integer representing total number of switches
+  output: Which lights are on after switching 
   rules:
     explicit:
+      - write a method
+      - Lights are initially off
     implicit:
+      - output should be array representing the places of the lights left on
 
 Examples and test cases:
 
@@ -31,7 +34,42 @@ Example with n = 5 lights:
 
 Data structure:
 
+  Array of Booleans - Integer operations - Iteration - Array of Integers from mapped Booleans
+
 Algorithm:
 
+  Define method called light_switcher with parameter n
+  Initialize array of n false elements to variable arr
+  Iterate n times, with index from 1 to n
+    Define iterative variable i
+    Iterate over arr elements
+      Define iterative variable ele
+      Toggle ele if index of ele plus 1 modulus i equals zero
+  Initialize answer to empty array
+  Iterate through arr elements
+    Define iterative variable ele
+    append index of ele plus 1 into answer if ele is true
+  Return answer
+
 =end
-# rubocop:enable all
+
+def light_switcher(n)
+  arr = (1..n).to_a.map { |_| false }
+  1.upto(n) do |i|
+    arr.map!.with_index do |ele, j|
+      if (j+1)%i == 0
+        !ele
+      else
+        ele
+      end
+    end
+  end
+  answer = []
+  arr.each.with_index do |ele, k|
+    answer << (k+1) if ele
+  end
+  answer
+end
+
+puts light_switcher(5) == [1, 4]
+puts light_switcher(10) == [1, 4, 9]
