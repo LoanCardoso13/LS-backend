@@ -48,7 +48,7 @@ Algorithm:
   Print the following
   spaces from n/2 (integer division) subtracting 1 until zero and then adding 1 up to n/2 (integer division) PLUS starts from 1 adding 2 until n and then subtracting 2 until 1
 
-  Define method called diamong with parameter n
+  Define method called diamons with parameter n
   Initialize j to 1
   From n/2 down to 0 do 
     Define iterative variable i
@@ -59,6 +59,22 @@ Algorithm:
     Define iterative variable k
     print k spaces plus l times stars
     Decrease l by 2
+
+-------------------------------------------------------
+
+  Define method called diamonds2 with parameter n
+  Initialize variable stars to 1
+  Initialize spaces variable to n/2
+  Iterate n times (indexing from 0 to n-1)
+    Define iterative variable i
+    If i <= n/2
+      print spaces times spaces + stars times stars
+      increase stars by 2
+      decrease spaces by 1
+    Else
+      increase spaces by 1
+      decrease stars by 2
+      print spaces times spaces + stars times stars
 
 =end
 
@@ -75,8 +91,24 @@ def diamonds(n)
   end
 end
 
-diamonds(1)
+def diamonds2(n)
+  stars = 1
+  spaces = n/2
+  n.times do |i|
+    if i <= n/2
+      puts ' '*spaces + '*'*stars
+      stars += 2
+      spaces -= 1
+    else
+      spaces = i == n/2+1 ? spaces + 2 : spaces + 1
+      stars = i == n/2+1 ? stars - 4 : stars - 2
+      puts ' '*spaces + '*'*stars
+    end
+  end
+end
+
+diamonds2(1)
 puts
-diamonds(3)
+diamonds2(3)
 puts
-diamonds(9)
+diamonds2(9)
