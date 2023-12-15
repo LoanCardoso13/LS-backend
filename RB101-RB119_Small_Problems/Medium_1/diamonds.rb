@@ -76,6 +76,20 @@ Algorithm:
       decrease stars by 2
       print spaces times spaces + stars times stars
 
+-------------------------------------------------------
+
+  Define method called diamonds 3 with parameter n
+  Initialize variable grid_line to n spaces
+  From 0 to n/2 do
+    Define iterative variable i
+    mutate grid_line from n / 2 - i to n / 2 + i range into (1 + 2*i) stars
+    print grid_line
+  From 1 to n/2 do
+    Define iterative variable j
+    mutate grid_line from 0, j characters,  to j spaces
+    mutate grid_line from -j, j characters, to j spaces
+    print grid_line
+
 =end
 
 def diamonds(n)
@@ -107,8 +121,21 @@ def diamonds2(n)
   end
 end
 
-diamonds2(1)
+def diamonds3(n)
+  grid_line = ' '*n
+  0.upto(n/2) do |i|
+    grid_line[n/2-i..n/2+i]= '*'*(1+2*i)
+    puts grid_line
+  end
+  1.upto(n/2) do |j|
+    grid_line[0, j]= ' '*j
+    grid_line[-j, j]= ' '*j
+    puts grid_line
+  end
+end
+
+diamonds3(1)
 puts
-diamonds2(3)
+diamonds3(3)
 puts
-diamonds2(9)
+diamonds3(9)
