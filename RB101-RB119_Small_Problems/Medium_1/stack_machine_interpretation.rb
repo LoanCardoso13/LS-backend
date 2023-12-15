@@ -18,6 +18,7 @@
   MOD Pops a value from the stack and divides it into the register value, storing the integer remainder of the division in the register.
   POP Remove the topmost item from the stack and place in register
   PRINT Print the register value
+
   All operations are integer operations (which is only important with DIV and MOD).
 
   Programs will be supplied to your language method via a string passed in as an argument. Your program may assume that all programs are correct programs; that is, they won't do anything like try to pop a non-existent value from the stack, and they won't contain unknown tokens.
@@ -28,10 +29,14 @@ PEDAC
 
 Problem:
 
-  input:
-  output:
+  input: program instructions in the form of String where the instructions are the words separated by spaces
+  output: stack containing correct values in the correct order, register containing the correct value and anything printed if so
   rules:
     explicit:
+      - write a method
+      - all instructions inputed are valid
+      - register starts with 0 value
+      - all numbers are integers and operations are integer operations
     implicit:
 
 Examples and test cases:
@@ -70,7 +75,107 @@ Examples and test cases:
 
 Data structure:
 
+  Array for stack - Control flow for instructions - Local Variable for register
+
 Algorithm:
 
+  Define method called minilang with parameter: instructions
+  Initialize stack to empty array
+  Initialize register to zero
+  Initialize parsed_instructions as instructions split into words
+  Iterate over elements of parsed_instructions
+    Define iterative variable instruction
+    Define case statement as follows:
+    case instruction
+    when 'PUSH'
+      exp1
+    when 'ADD'
+      exp2
+    when 'SUB'
+      exp3
+    when 'MULT'
+      exp4
+    when 'DIV'
+      exp5
+    when 'MOD'
+      exp6
+    when 'POP'
+      exp7
+    when 'PRINT'
+      exp8
+    else
+      exp9
+    end
+    where:
+    exp9 is: register= instruction integerfied
+    exp1 is: push register into stack
+    exp2 is: register= register + stack.pop
+    exp3 is: register= register - stack.pop
+    exp4 is: register= register * stack.pop
+    exp5 is: register= register / stack.pop
+    exp6 is: register= register % stack.pop
+    exp7 is: register= stack.pop
+    exp8 is: print register
+
 =end
-# rubocop:enable all
+
+def minilang(instructions)
+  stack = []
+  register = 0
+  parsed_instructions = instructions.split
+  parsed_instructions.each do |instruction|
+    case instruction
+    when 'PUSH'
+      stack << register
+    when 'ADD'
+      register += stack.pop
+    when 'SUB'
+      register -= stack.pop
+    when 'MULT'
+      register *= stack.pop
+    when 'DIV'
+      register /= stack.pop
+    when 'MOD'
+      register %= stack.pop
+    when 'POP'
+      register = stack.pop
+    when 'PRINT'
+      puts register
+    else
+      register = instruction.to_i
+    end
+  end
+end
+
+minilang('PRINT')
+# 0
+
+minilang('5 PUSH 3 MULT PRINT')
+# 15
+
+minilang('5 PRINT PUSH 3 PRINT ADD PRINT')
+# 5
+# 3
+# 8
+
+minilang('5 PUSH POP PRINT')
+# 5
+
+minilang('3 PUSH 4 PUSH 5 PUSH PRINT ADD PRINT POP PRINT ADD PRINT')
+# 5
+# 10
+# 4
+# 7
+
+minilang('3 PUSH PUSH 7 DIV MULT PRINT ')
+# 6
+
+minilang('4 PUSH PUSH 7 MOD MULT PRINT ')
+# 12
+
+minilang('-3 PUSH 5 SUB PRINT')
+# 8
+
+minilang('6 PUSH')
+# (nothing printed; no PRINT commands)
+
