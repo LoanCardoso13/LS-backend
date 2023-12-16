@@ -29,11 +29,14 @@ PEDAC
 
 Problem:
 
-  input:
-  output:
+  input: Integer
+  output: The computed fibonacci sequence result in the input's number place
   rules:
     explicit:
+      - write a recursive method
     implicit:
+      - input is always integer
+      - input may be 1 or 2, in which case output shall be 1
 
 Examples and test cases:
 
@@ -47,7 +50,30 @@ Examples and test cases:
 
 Data structure:
 
+  Recursion - Control flow
+
 Algorithm:
 
+  Define method called fibonacci with parameter: n
+  If n is 1 or 2
+    Return 1
+  Else
+    Return fibonacci(n-1) + fibonacci(n-2)
+  
 =end
-# rubocop:enable all
+
+def fibonacci(n)
+  if n == 1 || n == 2
+    1
+  else
+    fibonacci(n-1) + fibonacci(n-2)
+  end
+end
+
+puts fibonacci(1) == 1
+puts fibonacci(2) == 1
+puts fibonacci(3) == 2
+puts fibonacci(4) == 3
+puts fibonacci(5) == 5
+puts fibonacci(12) == 144
+puts fibonacci(20) == 6765
