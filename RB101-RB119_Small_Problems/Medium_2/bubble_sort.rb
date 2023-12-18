@@ -62,8 +62,14 @@ PEDAC
 
 Problem:
 
-  input:
-  output:
+  Write a method that implements a bubble sort algorithm in Arrays of at least size 2. The bubble sort algorithm abide by the following rules:
+    - Iterates through the each element of the Array input
+      - Compare element from current iteration with next element
+        - If bigger, swap them
+    - Repeat the above until an entire pass-through happens on the Array without any swap
+
+  input: Array with at least 2 elements
+  output: same Array (same, mutated object) with elements sorted
   rules:
     explicit:
     implicit:
@@ -86,4 +92,38 @@ Data structure:
 
 Algorithm:
 
+  Define method called bubble_sort! with parameter arr
+  Initialize vanilla loop
+    Initialize swap count variable to zero
+    Iterate through arr elements until second-to-last with index, iterative parameter: i
+      If element indexed at i is bigger than element indexed at i+1
+        Use parallel assignment to swap elements while mutating original array
+        Increase swap count by 1
+    Break returning arr if swap count is zero
+
 =end
+
+def bubble_sort!(arr)
+  loop do
+    swap_count = 0
+    (arr.length - 1).times do |i|
+      if arr[i] > arr[i+1]
+        arr[i], arr[i+1] = arr[i+1], arr[i]
+        swap_count += 1
+      end
+    end
+  break arr if swap_count == 0
+  end
+end
+
+array = [5, 3]
+bubble_sort!(array)
+puts array == [3, 5]
+
+array = [6, 2, 7, 1, 4]
+bubble_sort!(array)
+puts array == [1, 2, 4, 6, 7]
+
+array = %w(Sue Pete Alice Tyler Rachel Kim Bonnie)
+bubble_sort!(array)
+puts array == %w(Alice Bonnie Kim Pete Rachel Sue Tyler)
