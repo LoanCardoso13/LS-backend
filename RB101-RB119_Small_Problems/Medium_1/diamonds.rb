@@ -7,6 +7,18 @@ PEDAC
 
 Problem:
 
+  Write a method that takes an odd Integer n and displays/print a diamond in an nxn grid. The diamond is as follows:
+    - Has 4 points, 1 for each coordinate N, S, E, W
+      - A point is defined by displaying only 1 asteristik
+    - Symetric
+    - Horizontally, first half printed by
+      - First line containing 1 * in the middle of (n-1)/2 spaces,  
+      - Second line containing 3 *'s in the middle of (n-3)/2 spaces,
+      ... until there is no space left ( n = * )
+    - Then second half by 
+      - First line containing (n-2) *'s in the middle of 1 space 
+      - Second line containing (n-4) *'s in the middle of 2 spaces
+
   input: odd Integer
   output: 4-pointed diamond printed to the screen, consisting of an n x n grid (where n is input)
   rules:
