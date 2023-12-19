@@ -10,7 +10,7 @@ Problem:
   Write a method that takes an odd Integer n and displays/print a diamond in an nxn grid. The diamond is as follows:
     - Has 4 points, 1 for each coordinate N, S, E, W
       - A point is defined by displaying only 1 asteristik
-    - Symetric
+    - Symetric, both vertically and horizontally
     - Horizontally, first half printed by
       - First line containing 1 * in the middle of (n-1)/2 spaces,  
       - Second line containing 3 *'s in the middle of (n-3)/2 spaces,
@@ -102,6 +102,24 @@ Algorithm:
     mutate grid_line from -j, j characters, to j spaces
     print grid_line
 
+---
+  - Horizontally, first half printed by
+    - First line containing 1 * in the middle of (n-1)/2 spaces,  
+    - Second line containing 3 *'s in the middle of (n-3)/2 spaces,
+    ... until there is no space left ( n = * )
+  - Then second half by 
+    - First line containing (n-2) *'s in the middle of 1 space 
+    - Second line containing (n-4) *'s in the middle of 2 spaces
+    ... until * = 1 in the middle of (n-1)/2 spaces
+
+  Define method called diamonds 4 with parameter n
+  With index ranging from 1 to n, call it idx and 
+    next if idx is even
+    Print (n-idx)/2 spaces followed by idx *'s
+  With index ranging from 1 to (n-1)/2, call it idx and
+    Print idx spaces followed by (n-2*idx) *'s
+
+
 =end
 
 def diamonds(n)
@@ -146,8 +164,18 @@ def diamonds3(n)
   end
 end
 
-diamonds3(1)
+def diamonds4(n)
+  1.upto(n) do |idx|
+    next if idx.even?
+    puts ' '*((n-idx)/2) + '*'*idx
+  end
+  1.upto((n-1)/2) do |idx|
+    puts ' '*idx + '*'*(n-(2*idx))
+  end
+end
+
+diamonds4(1)
 puts
-diamonds3(3)
+diamonds4(3)
 puts
-diamonds3(9)
+diamonds4(9)
