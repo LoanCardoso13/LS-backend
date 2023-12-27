@@ -34,9 +34,10 @@
 PEDAC
 
 Problem:
+  Transpose a 3x3 matrix formed of nested Arrays. The original shall be left unchanged. 
 
-  input:
-  output:
+  input: Array of 3 Array with 3 Integers each
+  output: Array of 3 Array with 3 Integers each where its rows are the columns of input array and vice versa
   rules:
     explicit:
     implicit:
@@ -58,4 +59,30 @@ Data structure:
 
 Algorithm:
 
+  Initialize Array of 3 Arrays with 3 0 Integers in each as new_matrix
+  Iterate from rows 0 to 2 (i)
+    Iterate from columns 0 to 2 (j)
+      Assign matrix[i][j] into new_matrix[j][i]
+
 =end
+
+def transpose(arr)
+  new_matrix = [ [0, 0, 0], [0, 0, 0], [0, 0, 0] ]
+  3.times do |i|
+    3.times do |j|
+      new_matrix[j][i] = arr[i][j]
+    end
+  end
+  new_matrix
+end
+
+matrix = [
+    [1, 5, 8],
+    [4, 7, 2],
+    [3, 9, 6]
+  ]
+
+new_matrix = transpose(matrix)
+
+p new_matrix == [[1, 4, 3], [5, 7, 9], [8, 2, 6]]
+p matrix == [[1, 5, 8], [4, 7, 2], [3, 9, 6]]
