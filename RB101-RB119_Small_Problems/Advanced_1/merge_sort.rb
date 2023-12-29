@@ -18,9 +18,10 @@
 PEDAC
 
 Problem:
+  Sort an Array of Integers or Strings by breaking it down into nested sub-Arrays and then using the merge method from previous exercise.
 
-  input:
-  output:
+  input: Array of Integers or Strings
+  output: sorted Array
   rules:
     explicit:
     implicit:
@@ -36,5 +37,9 @@ Examples and test cases:
 Data structure:
 
 Algorithm:
+
+  1) Break down input 
+  1.1) 
+  2) Apply merge from previous exercise recursively until Array is flattened
 
 =end

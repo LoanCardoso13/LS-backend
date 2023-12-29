@@ -45,7 +45,7 @@ Data structure:
 
 Algorithm:
 
-  Explanation: The elsif branch of the If-expression did not have a condition set
+  Explanation: The elsif branch of the If-expression did not have a condition set, thence the return value of the Array#map method call becomes the condition and, as it will evaluate as truthy, it gets the code within it executed, but at this point there is no code to execute, so it returns nil. 
 
 =end
 
