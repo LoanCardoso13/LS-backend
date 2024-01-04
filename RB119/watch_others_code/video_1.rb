@@ -37,7 +37,8 @@ def common_chars(arr)
   alphabet.each do |letter|
     if arr.all? { |string| string.include?(letter)}
       # answer << (letter * arr.min { |a, b| a.count(letter) <=> b.count(letter) }.count(letter)).split('')
-      answer << (letter * (arr.map { |word| word.chars.tally }.sort_by { |hsh| hsh[letter] }[0][letter])).chars
+      # answer << (letter * (arr.map { |word| word.chars.tally }.sort_by { |hsh| hsh[letter] }[0][letter])).chars
+			answer << letter * (arr.map { |word| word.count.letter }.min)
     end
   end
   answer.flatten

@@ -16,7 +16,7 @@
 def minimum_sum(arr)
   all_sums = []
   0.upto(arr.length - 6) do |i|
-    all_sums << arr[i..(i+4)].sum
+    all_sums << arr[i, 5].sum
   end
   all_sums.min
 end

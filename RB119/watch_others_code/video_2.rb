@@ -20,7 +20,7 @@
 
 def get_it1(int)
   all_perms = []
-  int.digits.permutation(int.digits.size) { |perm| all_perms << perm.map(&:to_s).inject(:+).to_i }
+  int.digits.permutation(int.digits.size) { |perm| all_perms << perm.map(&:to_s).join.to_i }
   all_perms.sort!
   all_perms.uniq!
   all_perms[all_perms.index(int)+1] || -1

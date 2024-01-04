@@ -28,7 +28,7 @@ def max_sequence(arr)
   all_sums = []
   length = arr.length
   0.upto(length-2) do |i|
-    i.upto(length-1) do |j|
+    (i+1).upto(length-1) do |j|
       all_sums << arr[i..j].sum
     end
   end

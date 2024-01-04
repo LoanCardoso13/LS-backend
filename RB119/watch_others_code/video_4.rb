@@ -18,17 +18,17 @@
 # Return false
 
 def substring_test(string1, string2)
-  string1.downcase!
-  string2.downcase!
+  string1 = string1.downcase
+  string2 = string2.downcase
 
   all_subs1, all_subs2 = [], []
   0.upto(string1.length-2) do |i|
-    i.upto(string1.length) do |j|
+    (i+1).upto(string1.length-1) do |j|
       all_subs1 << string1[i..j]
     end
   end
   0.upto(string2.length-2) do |i|
-    i.upto(string2.length) do |j|
+    (i+1).upto(string2.length-1) do |j|
       all_subs2 << string2[i..j]
     end
   end
