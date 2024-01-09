@@ -1,3 +1,4 @@
+# rubocop:disable all
 =begin
 Find the length of the longest substring in the given string that is the same in reverse.
 
