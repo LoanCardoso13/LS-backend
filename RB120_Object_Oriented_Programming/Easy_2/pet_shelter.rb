@@ -46,12 +46,13 @@ The order of the output does not matter, so long as all of the information is pr
 
 =end
 
-class Pet
+class Pet < Shelter
   attr_reader :type, :name
 
   def initialize(type, name)
     @type= type
     @name= name
+    super.register['nobody'] << self
   end
 end
 

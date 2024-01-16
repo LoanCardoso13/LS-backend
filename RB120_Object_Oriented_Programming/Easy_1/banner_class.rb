@@ -49,8 +49,12 @@ puts banner
 =end
 
 class Banner
-  def initialize(message)
-    @message= message
+  attr_reader :message, :width, :message_line
+
+  def initialize(message, width)
+    @message = message
+    @width = width
+    message_slicer
   end
 
   def to_s
@@ -60,19 +64,34 @@ class Banner
   private
 
   def horizontal_rule
-    "+" + "-"*(@message.size+2) + "+"
+    "+ " + "-"*(width) + " +"
   end
 
   def empty_line
-    "|" + " "*(@message.size+2) + "|"
+    "| " + " "*(width) + " |"
   end
 
-  def message_line
-    "| #{@message} |"
+  def message_slicer
+    @message_line = []
+    idx_start = 0
+    loop do
+      if width < message[idx_start..-1].size
+        idx_end = message[0..(idx_start+width)].rindex(' ')
+        self.center_words(message[idx_start..idx_end])
+        idx_start = idx_end
+      else
+        self.center_words(message[idx_start..idx_end])
+        break
+      end
+    end
+  end
+
+  def center_words(line)
+    @message_line << "| #{line.center(width)} |"
   end
 end
 
-banner1 = Banner.new('To boldly go where no one has gone before.')
+banner1 = Banner.new('To boldly go where no one has gone before.', 20)
 puts banner1
-banner2 = Banner.new('')
+banner2 = Banner.new('To boldly go where no one has gone before.', 80)
 puts banner2
