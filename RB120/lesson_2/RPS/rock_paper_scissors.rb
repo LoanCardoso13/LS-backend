@@ -121,16 +121,13 @@ and spock game! I hope you enjoy it =)"
     answer == 'y'
   end
 
-  def show_rule
+  def show_rule(h_choice, c_choice)
     puts
-    if human.move.value > computer.move.value
-      idx = Move::WINNING_SEQUENCES.find_index{ |sequence| sequence[0] == human.move.value }
-      seq = Move::WINNING_SEQUENCES[idx]
-      puts "#{seq[0].capitalize} #{seq[1]} #{seq[2]}"
-    elsif human.move.value < computer.move.value
-      idx = Move::WINNING_SEQUENCES.find_index{ |sequence| sequence[0] == computer.move.value }
-      seq = Move::WINNING_SEQUENCES[idx]
-      puts "#{seq[0].capitalize} #{seq[1]} #{seq[2]}"
+    Move::WINNING_SEQUENCES.each do |sequence|
+      if [h_choice, c_choice].include?(sequence[0]) &&
+         [h_choice, c_choice].include?(sequence[-1])
+        puts "#{sequence[0].capitalize} #{sequence[1]} #{sequence[2]}"
+      end
     end
     puts
   end
@@ -140,7 +137,7 @@ and spock game! I hope you enjoy it =)"
       puts "#{player.name} chose #{player.move.value}."
     end
     sleep 1.3
-    show_rule
+    show_rule(human.move.value, computer.move.value)
   end
 
   def calculate_winner
