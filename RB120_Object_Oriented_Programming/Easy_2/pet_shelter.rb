@@ -1,101 +1,76 @@
-# rubocop:disable all
-=begin
-
-Consider the following code:
-
-butterscotch = Pet.new('cat', 'Butterscotch')
-pudding      = Pet.new('cat', 'Pudding')
-darwin       = Pet.new('bearded dragon', 'Darwin')
-kennedy      = Pet.new('dog', 'Kennedy')
-sweetie      = Pet.new('parakeet', 'Sweetie Pie')
-molly        = Pet.new('dog', 'Molly')
-chester      = Pet.new('fish', 'Chester')
-
-phanson = Owner.new('P Hanson')
-bholmes = Owner.new('B Holmes')
-
-shelter = Shelter.new
-shelter.adopt(phanson, butterscotch)
-shelter.adopt(phanson, pudding)
-shelter.adopt(phanson, darwin)
-shelter.adopt(bholmes, kennedy)
-shelter.adopt(bholmes, sweetie)
-shelter.adopt(bholmes, molly)
-shelter.adopt(bholmes, chester)
-shelter.print_adoptions
-puts "#{phanson.name} has #{phanson.number_of_pets} adopted pets."
-puts "#{bholmes.name} has #{bholmes.number_of_pets} adopted pets."
-
-Write the classes and methods that will be necessary to make this code run, and print the following output:
-
-P Hanson has adopted the following pets:
-a cat named Butterscotch
-a cat named Pudding
-a bearded dragon named Darwin
-
-B Holmes has adopted the following pets:
-a dog named Molly
-a parakeet named Sweetie Pie
-a dog named Kennedy
-a fish named Chester
-
-P Hanson has 3 adopted pets.
-B Holmes has 4 adopted pets.
-
-The order of the output does not matter, so long as all of the information is presented.
-
-=end
-
-class Pet < Shelter
-  attr_reader :type, :name
-
-  def initialize(type, name)
-    @type= type
-    @name= name
-    super.register['nobody'] << self
-  end
-end
-
-class Owner
-  attr_reader :name, :number_of_pets
-
-  def initialize(name)
-    @name= name
-    @number_of_pets= 0
-  end
-
-  def increase_pet
-    @number_of_pets += 1
+module Registrable
+  def number_of_pets
+    @pets.size
   end
 end
 
 class Shelter
+  attr_accessor :pets
+  attr_reader :name, :register
+
+  include Registrable
 
   def initialize
+    @pets = []
     @register = {}
+    @name = 'The Animal Shelter'
   end
 
-  def adopt(owner, pet)
-    if @register.keys.include?(owner)
-      @register[owner] << pet
-      owner.increase_pet
+  def adopt(owner = self, pet)
+    owner.pets << pet
+    if register.keys.include?(owner)
+      register[owner] << pet
     else
-      @register[owner] = [pet]
-      owner.increase_pet
+      register[owner] = [pet]
     end
   end
 
   def print_adoptions
-    @register.each do |owner, pets|
-      puts "#{owner.name} has adopted the following pets:"
-      pets.each do |pet|
-        puts "A #{pet.type} named #{pet.name}."
+    register.each do |owner, pets|
+      if owner.name == 'The Animal Shelter'
+        puts 'The Animal Shelter has the following unadopted pets:'
+        pets.each do |pet|
+          puts "a #{pet.type} named #{pet.name}"
+        end
+      else
+        puts "#{owner.name} has adopted the following pets:"
+        pets.each do |pet|
+          puts "a #{pet.type} named #{pet.name}"
+        end
       end
       puts
     end
   end
 end
 
+class Owner
+  attr_accessor :pets
+  attr_reader :name
+
+  include Registrable
+
+  def initialize(name)
+    @name = name
+    @pets = []
+  end
+end
+
+class Pet
+  attr_reader :name, :type
+
+  def initialize(type, name)
+    @type = type
+    @name = name
+  end
+end
+
+asta         = Pet.new('dog', 'Asta')
+laddie       = Pet.new('dog', 'Laddie')
+fluffy       = Pet.new('cat', 'Fluffy')
+kat          = Pet.new('cat', 'Kat')
+ben          = Pet.new('cat', 'Ben')
+chatterbox   = Pet.new('parakeet', 'Chatterbox')
+bluebell     = Pet.new('parakeet', 'Bluebell')
 butterscotch = Pet.new('cat', 'Butterscotch')
 pudding      = Pet.new('cat', 'Pudding')
 darwin       = Pet.new('bearded dragon', 'Darwin')
@@ -108,6 +83,13 @@ phanson = Owner.new('P Hanson')
 bholmes = Owner.new('B Holmes')
 
 shelter = Shelter.new
+shelter.adopt(asta)
+shelter.adopt(laddie)
+shelter.adopt(fluffy)
+shelter.adopt(kat)
+shelter.adopt(ben)
+shelter.adopt(chatterbox)
+shelter.adopt(bluebell)
 shelter.adopt(phanson, butterscotch)
 shelter.adopt(phanson, pudding)
 shelter.adopt(phanson, darwin)
@@ -118,4 +100,4 @@ shelter.adopt(bholmes, chester)
 shelter.print_adoptions
 puts "#{phanson.name} has #{phanson.number_of_pets} adopted pets."
 puts "#{bholmes.name} has #{bholmes.number_of_pets} adopted pets."
-
+puts "#{shelter.name} has #{shelter.number_of_pets} unadopted pets."

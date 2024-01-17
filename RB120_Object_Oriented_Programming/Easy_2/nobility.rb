@@ -18,20 +18,59 @@ byron.title
 
 =end
 
-module Movable
-
+module Walkable
   def walk
-    puts "#{self} #{gait} forward"
+    "#{self} #{gait} forward"
   end
 end
 
-class Noble
-  attr_reader :name, :title
-  include Movable
+class Animal
+  attr_reader :name
+
+  include Walkable
+
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    name
+  end
+end
+
+class Person < Animal
+
+  private
+
+  def gait
+    "strolls"
+  end
+end
+
+class Cat < Animal
+
+  private
+
+  def gait
+    "saunters"
+  end
+end
+
+class Cheetah < Cat
+
+  private
+
+  def gait
+    "runs"
+  end
+end
+
+class Noble < Person
+  attr_reader :title
 
   def initialize(name, title)
-    @name= name
-    @title= title
+    super(name)
+    @title = title
   end
 
   def to_s
@@ -43,10 +82,13 @@ class Noble
   def gait
     "struts"
   end
-
 end
 
 byron = Noble.new("Byron", "Lord")
-byron.walk # => "Lord Byron struts forward"
-puts byron.name # => "Byron"
-puts byron.title #=> "Lord"
+p byron.walk
+# => "Lord Byron struts forward"
+p byron.name
+# => "Byron"
+p byron.title
+# => "Lord"
+
