@@ -3,8 +3,11 @@ class Board
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
 
+  attr_reader :score, :squares
+
   def initialize
     @squares = {}
+    @score = [0, 0]
     reset
   end
 
@@ -53,11 +56,37 @@ class Board
     nil
   end
 
+  # returns threating to win marker's position or nil
+  # def imminent_threat
+    # WINNING_LINES.each do |line|
+      # squares = @squares.values_at(*line)
+      # if two_identical_markers?(squares)
+        # target_sqr = (squares - squares.select(&:marked?))[0]
+        # return @squares.key(target_sqr)
+      # end
+    # end
+    # nil
+  # end
+
+  def calculate_score
+    if winner_marker == TTTGame::HUMAN_MARKER
+      score[0] += 1
+    elsif winner_marker == TTTGame::COMPUTER_MARKER
+      score[1] += 1
+    end
+  end
+
   def reset
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
   private
+
+  # def two_identical_markers?(squares)
+    # markers = squares.select(&:marked?).map(&:marker)
+    # return false if markers.length != 2
+    # markers.uniq.size == 1
+  # end
 
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).map(&:marker)
@@ -86,6 +115,14 @@ class Square
   def marked?
     !unmarked?
   end
+
+  def human_marked?
+    marker == TTTGame::HUMAN_MARKER
+  end
+
+  def computer_marked?
+    marker == TTTGame::COMPUTER_MARKER
+  end
 end
 
 class Player
@@ -93,6 +130,58 @@ class Player
 
   def initialize(marker)
     @marker = marker
+  end
+
+  def strategy(board)
+    if immediate_win?(board)
+      immediate_win_pos(board)
+    elsif immediate_threat?(board)
+      immediate_threat_pos(board)
+    else
+      board.squares.select { |_, sqr| sqr.unmarked? }.keys.sample
+    end
+  end
+
+  def immediate_win?(board)
+    !!immediate_win_pos(board)
+  end
+
+  def immediate_threat?(board)
+    !!immediate_threat_pos(board)
+  end
+
+  def immediate_win_pos(board)
+    Board::WINNING_LINES.each do |line|
+      squares = board.squares.values_at(*line)
+      if opportunity_to_win?(squares)
+        target_sqr = (squares - squares.select(&:computer_marked?))[0]
+        return board.squares.key(target_sqr)
+      end
+    end
+    nil
+  end
+
+  def immediate_threat_pos(board)
+    Board::WINNING_LINES.each do |line|
+      squares = board.squares.values_at(*line)
+      if threat?(squares)
+        target_sqr = (squares - squares.select(&:human_marked?))[0]
+        return board.squares.key(target_sqr)
+      end
+    end
+    nil
+  end
+
+  def opportunity_to_win?(squares)
+    markers = squares.select(&:computer_marked?).map(&:marker)
+    return false if markers.length != 2
+    markers.uniq.size == 1
+  end
+
+  def threat?(squares)
+    markers = squares.select(&:human_marked?).map(&:marker)
+    return false if markers.length != 2
+    markers.uniq.size == 1
   end
 end
 
@@ -153,15 +242,28 @@ class TTTGame
     display_board
   end
 
+  def show_score
+    puts "Player: #{board.score[0]} vs Computer: #{board.score[1]}"
+  end
+
   def display_board
     puts "You're a #{human.marker}. Computer is a #{computer.marker}"
     puts ""
     board.draw
     puts ""
+    show_score
+  end
+
+  def joinor(arr_of_int, divisor = ', ', signal_last = ' or ')
+    if arr_of_int.size > 1
+      arr_of_int[0..-2].map(&:to_s).join(divisor) + signal_last + arr_of_int.last.to_s
+    else
+      arr_of_int[0]
+    end
   end
 
   def human_moves
-    puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
+    puts "Choose a square ( #{joinor(board.unmarked_keys)} )"
     square = nil
     loop do
       square = gets.chomp.to_i
@@ -172,8 +274,14 @@ class TTTGame
     board[square] = human.marker
   end
 
+  def threat?
+    !!board.imminent_threat
+  end
+
   def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
+    computer_mark_position = computer.strategy(board)
+    require 'pry'; require 'pry-byebug'; binding.pry
+    board[computer_mark_position] = computer.marker
   end
 
   def current_player_moves
@@ -186,6 +294,7 @@ class TTTGame
   end
 
   def display_result
+    board.calculate_score
     clear_screen_and_display_board
 
     case board.winner_marker
