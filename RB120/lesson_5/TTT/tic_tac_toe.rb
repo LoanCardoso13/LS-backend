@@ -56,22 +56,10 @@ class Board
     nil
   end
 
-  # returns threating to win marker's position or nil
-  # def imminent_threat
-    # WINNING_LINES.each do |line|
-      # squares = @squares.values_at(*line)
-      # if two_identical_markers?(squares)
-        # target_sqr = (squares - squares.select(&:marked?))[0]
-        # return @squares.key(target_sqr)
-      # end
-    # end
-    # nil
-  # end
-
-  def calculate_score
-    if winner_marker == TTTGame::HUMAN_MARKER
+  def calculate_score(human_marker, computer_marker)
+    if winner_marker == human_marker
       score[0] += 1
-    elsif winner_marker == TTTGame::COMPUTER_MARKER
+    elsif winner_marker == computer_marker
       score[1] += 1
     end
   end
@@ -81,12 +69,6 @@ class Board
   end
 
   private
-
-  # def two_identical_markers?(squares)
-    # markers = squares.select(&:marked?).map(&:marker)
-    # return false if markers.length != 2
-    # markers.uniq.size == 1
-  # end
 
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).map(&:marker)
@@ -116,85 +98,73 @@ class Square
     !unmarked?
   end
 
-  def human_marked?
-    marker == TTTGame::HUMAN_MARKER
-  end
+  # def human_marked?
+    # marker == TTTGame::HUMAN_MARKER
+  # end
 
-  def computer_marked?
-    marker == TTTGame::COMPUTER_MARKER
-  end
+  # def computer_marked?
+    # marker == TTTGame::COMPUTER_MARKER
+  # end
 end
 
 class Player
-  attr_reader :marker
+  attr_reader :name, :marker
 
-  def initialize(marker)
+  def initialize(name, marker)
+    @name = name
     @marker = marker
   end
+end
 
-  def strategy(board)
-    if immediate_win?(board)
-      immediate_win_pos(board)
-    elsif immediate_threat?(board)
-      immediate_threat_pos(board)
-    else
-      board.squares.select { |_, sqr| sqr.unmarked? }.keys.sample
+class Human < Player
+end
+
+class Computer < Player
+  # Return AI choice of position to mark
+  def strategy(board, human_marker, computer_marker)
+    def winning_square(board, line, computer_marker)
+      if line.count { |pos| board.squares[pos].marker == computer_marker } == 2 &&
+         line.count { |pos| board.squares[pos].marker == Square::INITIAL_MARKER } == 1
+        return line.select { |pos| board.squares[pos].marker == Square::INITIAL_MARKER }[0]
+      end
+      nil
     end
-  end
 
-  def immediate_win?(board)
-    !!immediate_win_pos(board)
-  end
-
-  def immediate_threat?(board)
-    !!immediate_threat_pos(board)
-  end
-
-  def immediate_win_pos(board)
     Board::WINNING_LINES.each do |line|
-      squares = board.squares.values_at(*line)
-      if opportunity_to_win?(squares)
-        target_sqr = (squares - squares.select(&:computer_marked?))[0]
-        return board.squares.key(target_sqr)
+      if !!winning_square(board, line, computer_marker)
+        return winning_square(board, line, computer_marker)
       end
     end
-    nil
-  end
 
-  def immediate_threat_pos(board)
+    def losing_square(board, line, human_marker)
+      if line.count { |pos| board.squares[pos].marker == human_marker } == 2 &&
+         line.count { |pos| board.squares[pos].marker == Square::INITIAL_MARKER } == 1
+        return line.select { |pos| board.squares[pos].marker == Square::INITIAL_MARKER }[0]
+      end
+      nil
+    end
+
     Board::WINNING_LINES.each do |line|
-      squares = board.squares.values_at(*line)
-      if threat?(squares)
-        target_sqr = (squares - squares.select(&:human_marked?))[0]
-        return board.squares.key(target_sqr)
+      if !!losing_square(board, line, human_marker)
+        return losing_square(board, line, human_marker)
       end
     end
-    nil
-  end
 
-  def opportunity_to_win?(squares)
-    markers = squares.select(&:computer_marked?).map(&:marker)
-    return false if markers.length != 2
-    markers.uniq.size == 1
-  end
+    return 5 if board.unmarked_keys.include?(5)
 
-  def threat?(squares)
-    markers = squares.select(&:human_marked?).map(&:marker)
-    return false if markers.length != 2
-    markers.uniq.size == 1
+    # Random pick
+    board.unmarked_keys.sample
   end
 end
 
 class TTTGame
-  HUMAN_MARKER = "X"
-  COMPUTER_MARKER = "O"
+  # HUMAN_MARKER = "X"
+  # COMPUTER_MARKER = "O"
 
   attr_reader :board, :human, :computer
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
     @turn_count = 0
   end
 
@@ -212,6 +182,7 @@ class TTTGame
   def main_game
     loop do
       display_board
+      who_goes_first
       player_move
       display_result
       break unless play_again?
@@ -228,9 +199,71 @@ class TTTGame
     end
   end
 
+  def ask_who_goes_first
+    puts
+    puts "Who should play first?"
+    puts "- (c) for Computer"
+    puts "- (p) for Player"
+    puts "- (r) for Random"
+    puts
+  end
+
+  def who_goes_first
+    ask_who_goes_first
+    answer = ''
+    choices = %w(c p r)
+    loop do
+      answer = gets.chomp.downcase
+      break if answer.start_with?(*choices)
+      puts "Sorry, invalid answer."
+    end
+    self.turn_count += 1 if answer.start_with?('c')
+    self.turn_count += [0, 1].sample if answer.start_with?('r')
+  end
+
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!"
     puts ""
+    define_player
+    define_computer
+    puts "Have fun #{human.name}!"
+  end
+
+  def define_player
+    puts "To kick things off, may I have your name please?"
+    name = input_name
+    puts "Cool, and what will be your marker?"
+    puts "Please choose among uppercase characters (A-Z)."
+    marker = input_marker
+    @human = Human.new(name, marker)
+  end
+
+  def define_computer
+    name = %w(R2D2 Chappie Mr.Roboto AI-jedi).sample
+    puts "Alright, #{human.name}, you'll be playing against #{name}"
+    puts "Which marker will you choose for your adversary? (A-Z)"
+    marker = input_marker
+    @computer = Computer.new(name, marker)
+  end
+
+  def input_marker
+    marker = ''
+    loop do
+      marker = gets.chomp
+      break if ('A'..'Z').include?(marker)
+      puts "Sorry, gotta choose uppercase letters from A to Z."
+    end
+    marker
+  end
+
+  def input_name
+    name = ''
+    loop do
+      name = gets.chomp
+      break unless name.empty?
+      puts "Sorry, name can't be blank."
+    end
+    name
   end
 
   def display_goodbye_message
@@ -279,8 +312,7 @@ class TTTGame
   end
 
   def computer_moves
-    computer_mark_position = computer.strategy(board)
-    require 'pry'; require 'pry-byebug'; binding.pry
+    computer_mark_position = computer.strategy(board, human.marker, computer.marker)
     board[computer_mark_position] = computer.marker
   end
 
@@ -294,7 +326,7 @@ class TTTGame
   end
 
   def display_result
-    board.calculate_score
+    board.calculate_score(human.marker, computer.marker)
     clear_screen_and_display_board
 
     case board.winner_marker
