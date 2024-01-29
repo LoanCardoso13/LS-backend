@@ -1,11 +1,13 @@
 module SystemOperations
-  def check_validity(answer, *checks)
+  def check_validity(*checks)
+    answer = gets.chomp.downcase
     answer.downcase!
     loop do
       break if answer.start_with?(*checks)
 
       puts 'Sorry, not a valid answer.'
     end
+    answer
   end
 
   def clear_screen
@@ -14,7 +16,7 @@ module SystemOperations
 end
 
 class Participant
-  attr_accessor :hand
+  attr_accessor :hand, :score
 
   def initialize
     @hand = []
@@ -25,7 +27,7 @@ class Participant
   end
 
   def show_hand
-    hand[0..-2].map(&:to_s).join(', ') + ' and ' + hand.last.to_s
+    "#{hand[0..-2].map(&:to_s).join(', ')} and #{hand.last}"
   end
 
   def busted?
@@ -35,8 +37,8 @@ class Participant
   def total
     while evaluate_hand > 21 && hand.map(&:rank).include?('ace')
       hand.each do |card|
-        if card.suit == 'ace'
-          card.suit = 'ace-'
+        if card.rank == 'ace'
+          card.rank = 'ace-'
           break
         end
       end
@@ -59,7 +61,7 @@ end
 class Dealer < Participant
   def hit(deck)
     super(deck)
-    puts "Dealer received a #{hand.last}"
+    puts "Dealer received #{hand.last}"
   end
 
   def stay
@@ -89,7 +91,8 @@ class Deck
 end
 
 class Card
-  attr_reader :suit, :rank
+  attr_reader :suit
+  attr_accessor :rank
 
   def initialize(suit, rank)
     @suit = suit
@@ -109,12 +112,16 @@ class Card
   end
 
   def to_s
-    rank.to_s + ' of ' + suit
+    if rank == 'ace-'
+      "ace of #{suit}"
+    else
+      "#{rank} of #{suit}"
+    end
   end
 end
 
 class Game
-  attr_accessor :deck, :player, :dealer
+  attr_accessor :deck, :player, :dealer, :score
 
   include SystemOperations
 
@@ -122,11 +129,25 @@ class Game
     @player = Player.new
     @dealer = Dealer.new
     @deck = Deck.new
+    @score = [0, 0]
+  end
+
+  def reset_game
+    @player = Player.new
+    @dealer = Dealer.new
+    @deck = Deck.new
   end
 
   def start
-    welcome_message
-    main_game
+    loop do
+      welcome_message
+      show_score
+      main_game
+      puts "Play again? (y/n)"
+      answer = check_validity('y', 'n')
+      break unless answer.start_with?('y')
+      reset_game
+    end
     goodbye_message
   end
 
@@ -135,7 +156,8 @@ class Game
     show_initial_cards
     player_turn
     dealer_turn unless player.busted?
-    compare_cards unless (dealer.busted? || player.busted?)
+    compare_cards unless dealer.busted? || player.busted?
+    compute_score
   end
 
   def welcome_message
@@ -143,6 +165,19 @@ class Game
     puts 'Welcome to the Twenty-One game!'
     puts "If you go over 21, it's a 'bust' and you lose."
     puts
+  end
+
+  def show_score
+    puts "Current score: Player #{score[0]} x #{score[1]} Dealer."
+    puts
+  end
+
+  def compute_score
+    if dealer.busted? || player.total > dealer.total
+      score[0] += 1
+    elsif player.busted? || player.total < dealer.total
+      score[1] += 1
+    end
   end
 
   def goodbye_message
@@ -158,7 +193,7 @@ class Game
   end
 
   def show_initial_cards
-    puts "Dealer has a #{dealer.hand[0]} and unknown card."
+    puts "Dealer has: #{dealer.hand[0]} and unknown card."
     show_player_cards
   end
 
@@ -167,17 +202,17 @@ class Game
   end
 
   def show_dealer_cards
-    puts "Dealer now has: #{dealer.show_hand}. His total is #{dealer.total}"
+    puts "Dealer has: #{dealer.show_hand}. His total is #{dealer.total}"
   end
 
   def player_turn
     loop do
       puts '(H)it or (S)tay?'
-      answer = gets.chomp.downcase
-      check_validity(answer, 'h', 's')
-
-      player.hit(deck) if answer.start_with?('h')
-      show_player_cards
+      answer = check_validity('h', 's')
+      if answer.start_with?('h')
+        player.hit(deck)
+        show_player_cards
+      end
       break if answer.start_with?('s') || player.busted?
     end
     puts "You got busted!" if player.busted?
@@ -187,9 +222,7 @@ class Game
     total = dealer.total
     while total < 17
       puts "Dealer total is less than 17, he decides to hit..."
-      sleep 1.3
       dealer.hit(deck)
-      sleep 1.3
       show_dealer_cards
       sleep 1.3
       total = dealer.total
@@ -200,11 +233,8 @@ class Game
 
   def compare_cards
     puts "It is now time to compare the cards..."
-    sleep 1.3
-    show_dealer_cards
-    sleep 1.3
     show_player_cards
-    sleep 1.3
+    show_dealer_cards
     if player.total > dealer.total
       puts "You won!"
     elsif player.total < dealer.total
