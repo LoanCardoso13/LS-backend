@@ -65,7 +65,7 @@ class Dealer < Participant
   end
 
   def stay
-    puts "Dealer also decided to stay."
+    puts "Dealer decides to stay."
   end
 end
 
@@ -100,7 +100,7 @@ class Card
   end
 
   def value
-    if rank.class == Integer
+    if rank.instance_of?(Integer)
       rank
     elsif rank == 'ace'
       11
@@ -173,11 +173,22 @@ class Game
   end
 
   def compute_score
-    if dealer.busted? || player.total > dealer.total
+    if someone_busted?
+      compute_busted_score
+    elsif player.total > dealer.total
       score[0] += 1
-    elsif player.busted? || player.total < dealer.total
+    elsif player.total < dealer.total
       score[1] += 1
     end
+  end
+
+  def compute_busted_score
+    score[0] += 1 if dealer.busted?
+    score[1] += 1 if player.busted?
+  end
+
+  def someone_busted?
+    player.busted? || dealer.busted?
   end
 
   def goodbye_message
@@ -210,16 +221,28 @@ class Game
       puts '(H)it or (S)tay?'
       answer = check_validity('h', 's')
       if answer.start_with?('h')
-        player.hit(deck)
-        show_player_cards
+        player_hit(deck)
       end
       break if answer.start_with?('s') || player.busted?
     end
     puts "You got busted!" if player.busted?
+    puts
+  end
+
+  def player_hit(deck)
+    player.hit(deck)
+    show_player_cards
   end
 
   def dealer_turn
-    total = dealer.total
+    puts "Now it's the dealer's turn!"
+    dealer_play(dealer.total)
+    puts "Dealer busted! You win!" if dealer.busted?
+    puts
+    dealer.stay unless dealer.busted?
+  end
+
+  def dealer_play(total)
     while total < 17
       puts "Dealer total is less than 17, he decides to hit..."
       dealer.hit(deck)
@@ -227,14 +250,20 @@ class Game
       sleep 1.3
       total = dealer.total
     end
-    puts "Dealer busted! You win!" if dealer.busted?
-    dealer.stay unless dealer.busted?
   end
 
   def compare_cards
     puts "It is now time to compare the cards..."
+    sleep 1.3
     show_player_cards
+    sleep 1.3
     show_dealer_cards
+    sleep 1.3
+    results
+    puts
+  end
+
+  def results
     if player.total > dealer.total
       puts "You won!"
     elsif player.total < dealer.total
@@ -243,6 +272,7 @@ class Game
       puts "It's a tie..."
     end
   end
+  sleep 1.3
 end
 
 Game.new.start
