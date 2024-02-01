@@ -73,3 +73,72 @@ puts buffer.get == nil
 The above code should display true 15 times.
 
 =end
+
+class CircularBuffer
+  attr_accessor :cb, :obj_count
+  attr_reader :size
+  
+  def initialize(size)
+    @size = size
+    @cb = {}
+    @obj_count = 0
+  end
+
+  def get
+    cb.delete(cb.keys.min)
+  end
+
+  def put(obj)
+    if self.is_full?
+      self.get
+      self.obj_count += 1
+      cb[obj_count] = obj
+    else
+      self.obj_count += 1
+      cb[obj_count] = obj
+    end
+  end
+
+  def is_full?
+    cb.size >= size
+  end
+end
+
+buffer = CircularBuffer.new(3)
+puts buffer.get == nil
+
+buffer.put(1)
+buffer.put(2)
+puts buffer.get == 1
+ 
+buffer.put(3)
+buffer.put(4)
+puts buffer.get == 2
+ 
+buffer.put(5)
+buffer.put(6)
+buffer.put(7)
+puts buffer.get == 5
+puts buffer.get == 6
+puts buffer.get == 7
+puts buffer.get == nil
+ 
+buffer = CircularBuffer.new(4)
+puts buffer.get == nil
+ 
+buffer.put(1)
+buffer.put(2)
+puts buffer.get == 1
+ 
+buffer.put(3)
+buffer.put(4)
+puts buffer.get == 2
+ 
+buffer.put(5)
+buffer.put(6)
+buffer.put(7)
+puts buffer.get == 4
+puts buffer.get == 5
+puts buffer.get == 6
+puts buffer.get == 7
+puts buffer.get == nil
