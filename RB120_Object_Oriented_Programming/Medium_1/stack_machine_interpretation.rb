@@ -56,3 +56,103 @@ Minilang.new('6 PUSH').eval
 # (nothing printed; no PRINT commands)
 
 =end
+
+class InvalidToken < StandardError; end
+class NoMoreStack < StandardError; end
+
+class Minilang
+  attr_reader :instructions
+  attr_accessor :register
+
+
+  def initialize(program)
+    @instructions = program.split
+    @register = 0
+    @@stack = []
+  end
+
+  def eval
+    instructions.each do |instruction|
+      begin
+
+        case instruction
+        when 'PRINT'
+          puts register
+        when 'PUSH'
+          @@stack << register
+        when 'ADD'
+          self.register += @@stack.pop
+        when 'SUB'
+          self.register -= @@stack.pop
+        when 'MULT'
+          self.register *= @@stack.pop
+        when 'DIV'
+          self.register /= @@stack.pop
+        when 'MOD'
+          self.register %= @@stack.pop
+        when 'POP'
+          self.register = @@stack.pop
+        else
+          self.register = instruction.to_i
+          raise InvalidToken, "Invalid token: #{instruction}" if instruction.to_i.to_s == "0"
+        end
+        raise NoMoreStack, "Empty stack!" if register == nil
+        
+      rescue InvalidToken => e
+
+        puts e.message
+        return
+
+      rescue NoMoreStack => e
+
+        puts e.message
+        return
+
+      end
+
+    end
+  end
+
+end
+
+Minilang.new('PRINT').eval
+# 0
+puts
+
+Minilang.new('5 PUSH 3 MULT PRINT').eval
+# # 15
+# 
+puts
+Minilang.new('5 PRINT PUSH 3 PRINT ADD PRINT').eval
+# # 5
+# # 3
+# # 8
+# 
+puts
+Minilang.new('5 PUSH 10 PRINT POP PRINT').eval
+# # 10
+# # 5
+# 
+puts
+Minilang.new('5 PUSH POP POP PRINT').eval
+# # Empty stack!
+#  
+puts
+Minilang.new('3 PUSH PUSH 7 DIV MULT PRINT ').eval
+# # 6
+# 
+puts
+Minilang.new('4 PUSH PUSH 7 MOD MULT PRINT ').eval
+# # 12
+# 
+puts
+Minilang.new('-3 PUSH 5 XSUB PRINT').eval
+# # Invalid token: XSUB
+# 
+puts
+Minilang.new('-3 PUSH 5 SUB PRINT').eval
+# # 8
+# 
+puts
+Minilang.new('6 PUSH').eval
+# # (nothing printed; no PRINT commands)
