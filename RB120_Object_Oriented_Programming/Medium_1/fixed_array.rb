@@ -56,7 +56,7 @@ class FixedArray
   attr_reader :fa
 
   def initialize(length)
-    @fa = Array.new(5)
+    @fa = Array.new(length)
   end
 
   def [](index)

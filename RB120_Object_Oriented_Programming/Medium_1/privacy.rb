@@ -33,9 +33,13 @@ class Machine
     self.flip_switch(:off)
   end
 
+  def check_switch_position
+    puts "The switch is #{switch}."
+  end
+
   private
 
-  attr_writer :switch
+  attr_accessor :switch
 
   def flip_switch(desired_state)
     self.switch = desired_state
