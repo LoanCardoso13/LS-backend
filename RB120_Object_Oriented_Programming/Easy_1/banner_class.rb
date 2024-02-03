@@ -49,12 +49,12 @@ puts banner
 =end
 
 class Banner
-  attr_reader :message, :width, :message_line
+  attr_reader :width
+  attr_accessor :message
 
-  def initialize(message, width)
+  def initialize(message, width = 0)
     @message = message
-    @width = width
-    message_slicer
+    @width = width == 0 ? message.size : width
   end
 
   def to_s
@@ -63,35 +63,33 @@ class Banner
 
   private
 
-  def horizontal_rule
-    "+ " + "-"*(width) + " +"
-  end
-
   def empty_line
-    "| " + " "*(width) + " |"
+    "| #{' ' * (width)} |"
   end
 
-  def message_slicer
-    @message_line = []
-    idx_start = 0
-    loop do
-      if width < message[idx_start..-1].size
-        idx_end = message[0..(idx_start+width)].rindex(' ')
-        self.center_words(message[idx_start..idx_end])
-        idx_start = idx_end
-      else
-        self.center_words(message[idx_start..idx_end])
-        break
+  def horizontal_rule
+    "+-#{'-' * (width)}-+"
+  end
+
+  def message_line
+    if message.size <= width
+      "| #{message.center(width)} |"
+    else
+      multi_line = []
+      while message.size > width      
+        stop_idx = message[0..width].rindex(' ')
+        substring = message[0...stop_idx]
+        self.message = message[(stop_idx+1)..-1]
+        multi_line << "| #{substring.center(width)} |"
       end
+      multi_line << "| #{message.center(width)} |"
+      multi_line.flatten
     end
-  end
-
-  def center_words(line)
-    @message_line << "| #{line.center(width)} |"
   end
 end
 
-banner1 = Banner.new('To boldly go where no one has gone before.', 20)
-puts banner1
-banner2 = Banner.new('To boldly go where no one has gone before.', 80)
-puts banner2
+puts Banner.new('')
+puts Banner.new('To boldly go where no one has gone before.')
+puts Banner.new('To boldly go where no one has gone before.', 80)
+txt = 'To boldly go where no one has gone before. '*7
+puts Banner.new(txt, 80)
