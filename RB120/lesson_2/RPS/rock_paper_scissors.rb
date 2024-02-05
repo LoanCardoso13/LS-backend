@@ -43,8 +43,13 @@ class Human < Player
   attr_reader :move
 
   def display_options
-    options = Move::VALID_CHOICES
-    puts "Please choose: #{options[0..-2].join(', ')} or #{options[-1]}"
+    parsed_options = parse_options(Move::VALID_CHOICES)
+    puts "#{name}, please choose: #{parsed_options}"
+    puts
+  end
+
+  def parse_options(options_array)
+    "#{options_array[0..-2].join(', ')} or #{options_array[-1]}"
   end
 
   def make_move
@@ -76,37 +81,63 @@ class Computer < Player
 end
 
 class RPSgame
+  BAR_SIZE = 80
+
   attr_accessor :human, :computer
 
   def naming_participants
+    name = user_input_name
+    self.human = Human.new(name)
+    self.computer = Computer.new(%w(R2D2 Chappie Mr.Roboto AI-jedi).sample)
+    puts "Alright, #{human.name}, you'll be playing against #{computer.name}."
+    sleep 1.3
+  end
+
+  def user_input_name
     name = ''
     loop do
-      puts "To kick things off, what's your name plase?"
+      puts "Before we begin, what's your name plase?"
       name = gets.chomp
       break unless name.empty?
       puts "Sorry, name can't be blank."
     end
-    self.human = Human.new(name)
-    self.computer = Computer.new(%w(R2D2 Chappie Mr.Roboto AI-jedi).sample)
-    puts "Alright, #{human.name}, you'll be playing against #{computer.name}."
+    name
   end
 
   def display_welcome_message
-    puts "Welcome to the rock, paper, scissors, lizard
-and spock game! I hope you enjoy it =)"
+    system 'clear'
+    puts "Welcome to the rock, paper, scissors, lizard and spock game! Enjoy =)"
     puts
+    display_rules
+    puts
+  end
+
+  def display_rules
     puts "In this game, the following rules apply:"
     puts
     Move::WINNING_SEQUENCES.each do |sequence|
       puts "#{sequence[0].capitalize} #{sequence[1]} #{sequence[2]},"
     end
+  end
+
+  def ending_game
+    puts
+    display_winner
+    puts
+    display_goodbye
     puts
   end
 
-  def display_farewell_message
-    puts "#{human.name} was the winner" if human.score > computer.score
-    puts "#{computer.name} was the winner" if human.score < computer.score
-    puts "Thanks for playing rock, paper and scissors!"
+  def display_winner
+    if human.score > computer.score
+      puts "#{human.name} was the winner".center(BAR_SIZE)
+    elsif human.score < computer.score
+      puts "#{computer.name} was the winner".center(BAR_SIZE)
+    end
+  end
+
+  def display_goodbye
+    puts "Thanks for playing rock, paper scissors, lizard and spock!"
     puts "Hope you had a good time!"
   end
 
@@ -127,6 +158,7 @@ and spock game! I hope you enjoy it =)"
       if [h_choice, c_choice].include?(sequence[0]) &&
          [h_choice, c_choice].include?(sequence[-1])
         puts "#{sequence[0].capitalize} #{sequence[1]} #{sequence[2]}"
+          .center(BAR_SIZE)
       end
     end
     puts
@@ -152,28 +184,26 @@ and spock game! I hope you enjoy it =)"
   end
 
   def display_score
-    bar_size = 80
-    puts "-" * bar_size
-    puts "Current score is:".center(bar_size)
+    system 'clear'
+    puts "-" * BAR_SIZE
+    puts "Current score is:".center(BAR_SIZE)
     puts "#{human.name}: #{human.score} vs #{computer.name}: #{computer.score}"
-      .center(bar_size)
-    puts "-" * bar_size
+      .center(BAR_SIZE)
+    puts "-" * BAR_SIZE
   end
 
-  # rubocop:disable Metrics/MethodLength
   def play
     display_welcome_message
     naming_participants
     loop do
+      display_score
       human.make_move
       computer.make_move
       calculate_winner
-      display_score
       break unless play_again?
     end
-    display_farewell_message
+    ending_game
   end
-  # rubocop:enable Metrics/MethodLength
 end
 
 RPSgame.new.play
