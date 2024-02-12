@@ -70,6 +70,10 @@ class Board
     squares[key].marker = marker
   end
 
+  def [](key)
+    squares[key].marker
+  end
+
   def empty_squares
     squares.keys.select { |key| squares[key].unmarked? }
   end
@@ -179,8 +183,38 @@ class Computer < Player
   CHARACTERS = %w(R2D2 Chappie Mr.Roboto AI-jedi)
 
   def marks(board)
-    choice = board.empty_squares.sample
+    choice = strategies(board)
     board[choice] = marker
+  end
+
+  def strategies(board)
+    # iterate through winning sequences
+    # if a sequence has 2 marks from self and an empty square
+    # return the position of that empty square
+    #
+    # iterate through winning sequences
+    # if a sequence has 1 empty square and only 2 types of markers
+    # return the position of that empty square
+
+    if board.empty_squares.include?(5)
+      return 5
+    end
+
+    Board::WINNING_SEQUENCES.each do |seq|
+      if seq.count { |pos| board[pos] == marker } == 2 &&
+         seq.map { |pos| board[pos] }.include?(Square::INITIAL_MARKER)
+        return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
+      end
+    end
+
+    Board::WINNING_SEQUENCES.each do |seq|
+      if seq.map { |pos| board[pos] }.uniq.size == 2 &&
+         seq.count { |pos| board[pos] == Square::INITIAL_MARKER } == 1
+        return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
+      end
+    end
+
+    board.empty_squares.sample
   end
 end
 
@@ -329,10 +363,10 @@ class GameEngine
   end
 
   def display_result
-    if board.full?
-      puts "It's a tie..."
-    else
+    if board.someone_won?
       print_winner_and_update_score(board.winner_marker)
+    else
+      puts "It's a tie..."
     end
   end
 
