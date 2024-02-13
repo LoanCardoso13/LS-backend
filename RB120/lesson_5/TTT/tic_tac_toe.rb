@@ -86,6 +86,8 @@ class Board
     !!winner_marker
   end
 
+  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize
   def display
     empty_line
     centered "     |     |     "
@@ -101,6 +103,8 @@ class Board
     centered "     |     |     "
     empty_line
   end
+  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/MethodLength
 
   def winner_marker
     WINNING_SEQUENCES.each do |sequence|
@@ -162,7 +166,7 @@ class Human < Player
 
   def joinor(array)
     if array.size > 1
-      array[0..-2].join(', ') + ' or ' + array.last.to_s
+      "#{array[0..-2].join(', ')} or #{array.last}"
     else
       array[0]
     end
@@ -188,17 +192,22 @@ class Computer < Player
   end
 
   def strategies(board)
-    # iterate through winning sequences
-    # if a sequence has 2 marks from self and an empty square
-    # return the position of that empty square
-    #
-    # iterate through winning sequences
-    # if a sequence has 1 empty square and only 2 types of markers
-    # return the position of that empty square
-
     if board.empty_squares.include?(5)
       return 5
     end
+
+    if offensive_move?(board)
+      return offensive_move(board)
+    elsif defensive_move?(board)
+      return defensive_move(board)
+    end
+    board.empty_squares.sample
+  end
+
+  def offensive_move(board)
+    # iterate through winning sequences
+    # if a sequence has 2 marks from self and an empty square
+    # return the position of that empty square
 
     Board::WINNING_SEQUENCES.each do |seq|
       if seq.count { |pos| board[pos] == marker } == 2 &&
@@ -206,6 +215,17 @@ class Computer < Player
         return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
       end
     end
+    nil
+  end
+
+  def offensive_move?(board)
+    !!offensive_move(board)
+  end
+
+  def defensive_move(board)
+    # iterate through winning sequences
+    # if a sequence has 1 empty square and only 1 other type of marker
+    # return the position of that empty square
 
     Board::WINNING_SEQUENCES.each do |seq|
       if seq.map { |pos| board[pos] }.uniq.size == 2 &&
@@ -213,8 +233,11 @@ class Computer < Player
         return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
       end
     end
+    nil
+  end
 
-    board.empty_squares.sample
+  def defensive_move?(board)
+    !!defensive_move(board)
   end
 end
 
@@ -238,7 +261,8 @@ class GameEngine
     user_name, computer_name = name_participants
     empty_line
     user_marker, computer_marker = define_markers
-    define_order_of_players(user_name, computer_name, user_marker, computer_marker)
+    define_order_of_players(user_name, computer_name,
+                            user_marker, computer_marker)
     empty_line
     acknowledge_players
   end
@@ -256,7 +280,8 @@ class GameEngine
 
   def display_score
     empty_line
-    bannerized "Current score: #{player1.name} #{player1.score} x #{player2.score} #{player2.name}"
+    bannerized "Current score: #{player1.name} #{player1.score}\
+ x #{player2.score} #{player2.name}"
     empty_line
   end
 
@@ -305,18 +330,20 @@ class GameEngine
   end
 
   def display_participants
-    centered "#{player1.name} is #{player1.marker}, #{player2.name} is #{player2.marker}."
+    centered "#{player1.name} is #{player1.marker},\
+ #{player2.name} is #{player2.marker}."
   end
 
   def name_participants
     centered "To start things off, may I have your name please?"
     user_name = check_if_empty_user_input
     computer_name = Computer::CHARACTERS.sample
-    [ user_name, computer_name ]
+    [user_name, computer_name]
   end
 
   def acknowledge_players
-    puts "Okay, this will be a match of #{player1.name} against #{player2.name}."
+    puts "Okay, this will be a match of\
+ #{player1.name} against #{player2.name}."
     puts "#{player1.name} will start."
     press_enter(BAR_SIZE)
   end
@@ -329,26 +356,37 @@ class GameEngine
     empty_line
     centered "And what marker will you choose to your adversary? (A-Z)"
     computer_marker = validate_user_input(*alphabet)
-    [ user_marker, computer_marker ]
+    [user_marker, computer_marker]
   end
 
-  def define_order_of_players(user_name, computer_name, user_marker, computer_marker)
+  def define_order_of_players(user_name, computer_name,
+                              user_marker, computer_marker)
+    # Defaults to Computer as first player
+    self.player1 = Computer.new(computer_name, computer_marker)
+    self.player2 = Human.new(user_name, user_marker)
     ask_who_goes_first
     choice = validate_user_input('c', 'p', 'r')
+    # Change order of players in case user choice demands it
+    change_order_of_players(user_name, computer_name,
+                            user_marker, computer_marker, choice)
+  end
+
+  def change_order_of_players(user_name, computer_name,
+                              user_marker, computer_marker, choice)
     case choice
-    when 'c'
-      self.player1 = Computer.new(computer_name, computer_marker)
-      self.player2 = Human.new(user_name, user_marker)
     when 'p'
-      self.player1 = Human.new(user_name, user_marker)
-      self.player2 = Computer.new(computer_name, computer_marker)
+      self.player1, self.player2 = player2, player1
     when 'r'
-      randomize_players_order(user_name, computer_name, user_marker, computer_marker)
+      randomize_players_order(user_name, computer_name,
+                              user_marker, computer_marker)
     end
   end
 
-  def randomize_players_order(user_name, computer_name, user_marker, computer_marker)
-    random_order_players = [ Human.new(user_name, user_marker), Computer.new(computer_name, computer_marker) ].shuffle!
+  def randomize_players_order(user_name, computer_name,
+                              user_marker, computer_marker)
+    random_order_players = [Human.new(user_name, user_marker),
+                            Computer.new(computer_name, computer_marker)]
+                           .shuffle!
     self.player1 = random_order_players[0]
     self.player2 = random_order_players[1]
   end
