@@ -1,3 +1,44 @@
+module Validatable
+  def validate_user_input(*validators)
+    answer = ''
+    loop do
+      answer = gets.chomp.downcase
+      break if validators.include?(answer)
+      puts "Sorry, invalid input."
+    end
+    answer
+  end
+
+  def check_if_empty_user_input
+    answer = ''
+    loop do
+      answer = gets.chomp.strip
+      break unless answer.empty?
+      puts "Sorry, it can't be blank."
+    end
+    answer
+  end
+
+  def press_enter(bar_size)
+    puts "[press enter]".rjust(bar_size)
+    gets.chomp
+  end
+end
+
+module Displayable
+  def cadence_pause
+    sleep 1.3
+  end
+
+  def clear_screen
+    system 'clear'
+  end
+
+  def empty_line
+    puts
+  end
+end
+
 class Move
   WINNING_SEQUENCES = [
     ['scissors', 'cuts', 'paper'],
@@ -35,48 +76,15 @@ class Move
   end
 end
 
-# class Rock
-#   include Playable, Comparable
-#
-#   def initialize
-#     @value = 'rock'
-#   end
-# end
-#
-# class Paper
-#   include Playable, Comparable
-#
-#   def initialize
-#     @value = 'paper'
-#   end
-# end
-#
-# class Scissors
-#   include Playable, Comparable
-#
-#   def initialize
-#     @value = 'scissors'
-#   end
-# end
-#
-# class Lizard
-#   include Playable, Comparable
-#
-#   def initialize
-#     @value = 'lizard'
-#   end
-# end
-#
-# class Spock
-#   include Playable, Comparable
-#
-#   def initialize
-#     @value = 'spock'
-#   end
-# end
-
 class Player
-  VALID_CHOICES = %w(rock paper scissors lizard spock)
+  # VALID_CHOICES = %w((r)ock (p)aper (sc)issors (l)izard (sp)ock)
+  VALID_CHOICES = {
+    '(r)ock' => 'rock',
+    '(p)aper' => 'paper',
+    '(sc)issors' => 'scissors',
+    '(l)izard' => 'lizard',
+    '(sp)ock' => 'spock'
+  }
 
   attr_accessor :name, :score, :moves
 
@@ -88,29 +96,22 @@ class Player
 end
 
 class Human < Player
+  include Validatable, Displayable
+
   def display_options
-    parsed_options = parse_options(VALID_CHOICES)
+    parsed_options = parse_options(VALID_CHOICES.keys)
     puts "#{name}, please choose: #{parsed_options}"
-    puts
+    empty_line
   end
 
   def parse_options(options_array)
     "#{options_array[0..-2].join(', ')} or #{options_array[-1]}"
   end
 
-  def user_input_choice
-    choice = ''
-    loop do
-      choice = gets.chomp
-      break if VALID_CHOICES.include?(choice)
-      puts "Sorry, not a valid choice."
-    end
-    choice
-  end
-
   def make_move
     display_options
-    choice = user_input_choice
+    user_input = validate_user_input('r', 'p', 'sc', 'l', 'sp')
+    choice = VALID_CHOICES.values.select { |value| value.start_with?(user_input) }[0]
     current_move = Move.new(choice)
     moves << current_move
   end
@@ -126,7 +127,7 @@ class Computer < Player
 
   def define_choices(character)
     character_choices = []
-    VALID_CHOICES.each_with_index do |choice, idx|
+    VALID_CHOICES.values.each_with_index do |choice, idx|
       character_choices << ([choice] * PROFILES[character.name][idx])
     end
     character_choices.flatten
@@ -142,44 +143,66 @@ end
 class RPSgame
   BAR_SIZE = 80
 
-  attr_accessor :human, :computer
+  include Validatable, Displayable
 
-  def naming_participants
-    user_name = user_input_name
-    self.human = Human.new(user_name)
-    self.computer = Computer.new(Computer::CHARACTERS.sample)
-    puts "Alright, #{human.name}, you'll be playing against #{computer.name}."
+  attr_accessor :human, :computer, :round_limit
+
+  def initialize
+    @round_limit = nil
   end
 
-  def user_input_name
-    name = ''
-    loop do
-      puts "Before we begin, what's your name plase?"
-      name = gets.chomp
-      break unless name.empty?
-      puts "Sorry, name can't be blank."
+  def naming_participants
+    puts "Before we begin, what's your name plase?"
+    user_name = check_if_empty_user_input
+    self.human = Human.new(user_name)
+    self.computer = Computer.new(Computer::CHARACTERS.sample)
+    empty_line
+  end
+
+  def ask_number_of_rounds
+    puts "Would you like to set a limit of rounds to declare the winner? (y/n)"
+    answer = validate_user_input('y', 'n')
+    if answer == 'y'
+      puts "How many rounds would you like to play?"
+      self.round_limit = validate_user_input(*((1..100).to_a.map(&:to_s)))
     end
-    name
+    empty_line
+  end
+
+  def round_limit?
+    !!round_limit
+  end
+
+  def acknowledge_setup
+    puts "Alright, #{human.name}, you'll be playing against #{computer.name}."
+    puts "There will be a total of #{round_limit} round(s)." if round_limit?
+    press_enter(BAR_SIZE)
   end
 
   def display_welcome_message
+    clear_screen
     puts "Welcome to the rock, paper, scissors, lizard and spock game! Enjoy =)"
+    empty_line
   end
 
   def display_rules
     puts "In this game, the following rules apply:"
-    puts
+    empty_line
+    # The WINNING_SEQUENCES sub arrays follow a pattern of
+    # Noun verb noun and can be displayed iteratively
+    # To announce the rules of the game:
     Move::WINNING_SEQUENCES.each do |sequence|
       puts "#{sequence[0].capitalize} #{sequence[1]} #{sequence[2]},"
     end
+    empty_line
   end
 
   def end_game
-    puts
+    empty_line
     display_overall_winner
-    puts
+    empty_line
     display_goodbye
-    puts
+    empty_line
   end
 
   def display_overall_winner
@@ -196,18 +219,13 @@ class RPSgame
   end
 
   def play_again?
-    answer = ''
-    loop do
-      puts "Would you like to play again? (y/n)"
-      answer = gets.chomp
-      break if %w(y n).include? answer.downcase
-      puts "Sorry, not valid input. Gotta choose: (y,n)"
-    end
+    puts "Would you like to play again? (y/n)"
+    answer = validate_user_input('y', 'n')
     answer == 'y'
   end
 
   def display_winning_rule(h_move, c_move)
-    puts
+    empty_line
     Move::WINNING_SEQUENCES.each do |sequence|
       if [h_move.value, c_move.value].include?(sequence[0]) &&
          [h_move.value, c_move.value].include?(sequence[-1])
@@ -215,14 +233,14 @@ class RPSgame
           .center(BAR_SIZE)
       end
     end
-    puts
+    empty_line
   end
 
   def display_choices
     [human, computer].each do |player|
       puts "#{player.name} chose #{player.moves.last}."
     end
-    sleep 1.3
+    cadence_pause
   end
 
   def calculate_match_winner
@@ -242,40 +260,57 @@ class RPSgame
   end
 
   def display_history
+    clear_screen
     return if human.moves.empty?
     human.moves.each_with_index do |human_move, idx|
-      print "Round #{idx + 1}: "
-      print "#{human.name} chose #{human_move} and "
-      puts "#{computer.name} chose #{computer.moves[idx]}."
+      puts "Round #{idx + 1}: \
+#{human.name} chose #{human_move} and \
+#{computer.name} chose #{computer.moves[idx]}."
     end
+    empty_line
   end
 
-  # rubocop:disable Metrics/AbcSize
-  # rubocop:disable Metrics/MethodLength
   def play
-    system 'clear'
-    display_welcome_message
-    puts
-    display_rules
-    puts
-    naming_participants
-    sleep 1.3
-    loop do
-      system 'clear'
-      display_history
-      puts
-      display_score
-      human.make_move
-      computer.make_move
-      display_choices
-      display_winning_rule(human.moves.last, computer.moves.last)
-      calculate_match_winner || (puts "It's a tie...")
-      break unless play_again?
+    game_setup
+    if round_limit?
+      bounded_game
+    else
+      unbounded_game
     end
     end_game
   end
-  # rubocop:enable Metrics/MethodLength
-  # rubocop:enable Metrics/AbcSize
+
+  def bounded_game
+    round_limit.to_i.times do
+      main_game
+      press_enter(BAR_SIZE)
+    end
+  end
+
+  def unbounded_game
+    loop do
+      main_game
+      break unless play_again?
+    end
+  end
+
+  def game_setup
+    display_welcome_message
+    display_rules
+    naming_participants
+    ask_number_of_rounds
+    acknowledge_setup
+  end
+
+  def main_game
+    display_history
+    display_score
+    human.make_move
+    computer.make_move
+    display_choices
+    display_winning_rule(human.moves.last, computer.moves.last)
+    calculate_match_winner || (puts "It's a tie...")
+  end
 end
 
 RPSgame.new.play
