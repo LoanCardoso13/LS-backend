@@ -77,14 +77,12 @@ class Move
 end
 
 class Player
-  # VALID_CHOICES = %w((r)ock (p)aper (sc)issors (l)izard (sp)ock)
-  VALID_CHOICES = {
-    '(r)ock' => 'rock',
-    '(p)aper' => 'paper',
-    '(sc)issors' => 'scissors',
-    '(l)izard' => 'lizard',
-    '(sp)ock' => 'spock'
-  }
+  CORE_MOVES = %w(rock paper scissors lizard spock)
+  CORE_MOVES_UI = %w((r)rock (p)aper (sc)issors (l)izard (sp)ock)
+  VALID_CHOICES = {}
+  CORE_MOVES.size.times do |idx|
+    VALID_CHOICES[CORE_MOVES_UI[idx]] = CORE_MOVES[idx]
+  end
 
   attr_accessor :name, :score, :moves
 
@@ -111,7 +109,9 @@ class Human < Player
   def make_move
     display_options
     user_input = validate_user_input('r', 'p', 'sc', 'l', 'sp')
-    choice = VALID_CHOICES.values.select { |value| value.start_with?(user_input) }[0]
+    choice = VALID_CHOICES.values.select do |value|
+      value.start_with?(user_input)
+    end[0]
     current_move = Move.new(choice)
     moves << current_move
   end
@@ -119,11 +119,17 @@ end
 
 class Computer < Player
   CHARACTERS = %w(R2D2 Chappie Mr.Roboto AI-jedi)
+  WHEIGHTS = [
+    [50, 25, 10, 10, 5],
+    [25, 10, 10, 25, 30],
+    [10, 20, 30, 40, 0],
+    [20, 20, 20, 20, 20]
+  ]
   # Choices profile for each character, wheighted by percentage
-  PROFILES = { 'R2D2' => [50, 25, 10, 10, 5],
-               'Chappie' => [25, 10, 10, 25, 30],
-               'Mr.Roboto' => [10, 20, 30, 40, 0],
-               'AI-jedi' => [20, 20, 20, 20, 20] }
+  PROFILES = {}
+  CHARACTERS.size.times do |idx|
+    PROFILES[CHARACTERS[idx]] = WHEIGHTS[idx]
+  end
 
   def define_choices(character)
     character_choices = []
@@ -145,11 +151,23 @@ class RPSgame
 
   include Validatable, Displayable
 
-  attr_accessor :human, :computer, :round_limit
-
   def initialize
     @round_limit = nil
   end
+
+  def play
+    game_setup
+    if round_limit?
+      bounded_game
+    else
+      unbounded_game
+    end
+    end_game
+  end
+
+  private
+
+  attr_accessor :human, :computer, :round_limit
 
   def naming_participants
     puts "Before we begin, what's your name plase?"
@@ -268,16 +286,6 @@ class RPSgame
 #{computer.name} chose #{computer.moves[idx]}."
     end
     empty_line
-  end
-
-  def play
-    game_setup
-    if round_limit?
-      bounded_game
-    else
-      unbounded_game
-    end
-    end_game
   end
 
   def bounded_game
