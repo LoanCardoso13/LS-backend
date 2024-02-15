@@ -1,77 +1,144 @@
-module SystemOperations
-  def check_validity(*checks)
-    answer = gets.chomp.downcase
-    answer.downcase!
+module Validatable
+  def validate_user_input(*validators)
+    answer = ''
     loop do
-      break if answer.start_with?(*checks)
-
-      puts 'Sorry, not a valid answer.'
+      answer = gets.chomp.downcase
+      break if validators.include?(answer)
+      puts "Sorry, invalid input."
     end
     answer
+  end
+
+  def check_for_emptiness
+    answer = ''
+    loop do
+      answer = gets.chomp
+      break unless answer.strip.empty?
+      puts "Sorry, name can't be blank."
+    end
+    answer
+  end
+
+  def press_enter
+    puts '[press enter]'.rjust(Displayable::BAR_SIZE)
+    gets
+  end
+end
+
+module Displayable
+  BAR_SIZE = 80
+  SHIFT_AMOUNT = 30
+
+  def centered(line)
+    puts line.center(BAR_SIZE)
+  end
+
+  def empty_line
+    puts
   end
 
   def clear_screen
     system 'clear'
   end
+
+  def shifted(line)
+    puts "#{' ' * SHIFT_AMOUNT}#{line}"
+  end
+
+  def cadence_pause
+    sleep 1.3
+  end
 end
 
-class Participant
-  attr_accessor :hand, :score
-
-  def initialize
-    @hand = []
-  end
-
-  def hit(deck)
-    hand << deck.deal
-  end
-
-  def show_hand
-    "#{hand[0..-2].map(&:to_s).join(', ')} and #{hand.last}"
-  end
-
+module Hand
   def busted?
     total > 21
   end
 
   def total
-    while evaluate_hand > 21 && hand.map(&:rank).include?('ace')
-      hand.each do |card|
-        if card.rank == 'ace'
-          card.rank = 'ace-'
-          break
-        end
-      end
-    end
-    evaluate_hand
+    sum = 0
+    sum = total_without_correction(sum)
+    correct_for_aces(sum)
   end
 
-  def evaluate_hand
-    hand.map(&:value).sum
+  def total_without_correction(sum)
+    cards.each do |card|
+      sum += if face_value?(card)
+               card.rank.to_i
+             elsif card.rank == 'Ace'
+               11
+             else
+               10
+             end
+    end
+    sum
+  end
+
+  def face_value?(card)
+    card.rank.to_i != 0
+  end
+
+  def correct_for_aces(sum)
+    cards.count { |card| card.rank == 'Ace' }.times do
+      break if sum <= 21
+      sum -= 10
+    end
+    sum
+  end
+end
+
+class Participant
+  include Hand, Displayable
+
+  attr_accessor :name, :cards
+
+  def initialize(name)
+    @name = name
+    @cards = []
+  end
+
+  def hit_and_show_hand(deck)
+    puts "#{name} hits!"
+    cards << deck.deal
+    show_all_hand
+  end
+
+  def stay
+    puts "#{name} stays!"
+    empty_line
+  end
+
+  def show_all_hand
+    shifted "---- #{name}'s hand ----"
+    cards.each do |card|
+      shifted "=> #{card}"
+    end
+    shifted "=> total: #{total}"
+    empty_line
   end
 end
 
 class Player < Participant
-  def hit(deck)
-    super(deck)
-    puts "You got a #{hand.last}."
-  end
 end
 
 class Dealer < Participant
-  def hit(deck)
-    super(deck)
-    puts "Dealer received #{hand.last}"
+  CHARACTERS = %w(R2D2 Chappie Mr.Roboto AI-jedi)
+
+  def stay?
+    total >= 17
   end
 
-  def stay
-    puts "Dealer decides to stay."
+  def show_partial_hand
+    shifted "---- #{name}'s hand ----"
+    shifted "=> #{cards[0]}"
+    shifted "=> ???"
+    empty_line
   end
 end
 
 class Deck
-  RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
-  SUITS = %w(hearts diamonds clubs spades)
+  SUITS = %w(Clubs Diamonds Hearts Spades)
+  RANKS = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace)
 
   attr_reader :cards
 
@@ -82,197 +149,176 @@ class Deck
         @cards << Card.new(suit, rank)
       end
     end
+    @cards.shuffle!
   end
 
   def deal
-    cards.shuffle!
     cards.pop
   end
 end
 
 class Card
-  attr_reader :suit
-  attr_accessor :rank
+  attr_reader :suit, :rank
 
   def initialize(suit, rank)
     @suit = suit
     @rank = rank
   end
 
-  def value
-    if rank.instance_of?(Integer)
-      rank
-    elsif rank == 'ace'
-      11
-    elsif rank == 'ace-'
-      1
-    else
-      10
-    end
-  end
-
   def to_s
-    if rank == 'ace-'
-      "ace of #{suit}"
-    else
-      "#{rank} of #{suit}"
-    end
+    "#{rank} of #{suit}"
   end
 end
 
 class Game
-  attr_accessor :deck, :player, :dealer, :score
-
-  include SystemOperations
+  include Displayable, Validatable
 
   def initialize
-    @player = Player.new
-    @dealer = Dealer.new
     @deck = Deck.new
-    @score = [0, 0]
   end
 
-  def reset_game
-    @player = Player.new
-    @dealer = Dealer.new
+  def reset
     @deck = Deck.new
+    player.cards = []
+    dealer.cards = []
   end
 
   def start
+    game_setup
     loop do
-      welcome_message
-      show_score
-      main_game
-      puts "Play again? (y/n)"
-      answer = check_validity('y', 'n')
-      break unless answer.start_with?('y')
-      reset_game
+      main
+      break unless play_again?
+      reset
     end
-    goodbye_message
+    game_end
   end
 
-  def main_game
+  private
+
+  attr_reader :deck
+
+  attr_accessor :player, :dealer
+
+  def game_setup
+    display_welcome_message
+    assign_names
+    acknowledge_game_setup
+  end
+
+  def main
     deal_cards
     show_initial_cards
     player_turn
-    dealer_turn unless player.busted?
-    compare_cards unless dealer.busted? || player.busted?
-    compute_score
+    player.busted? || dealer_turn
+    anyone_busted? || compare_cards
+    show_result if anyone_busted?
   end
 
-  def welcome_message
-    clear_screen
-    puts 'Welcome to the Twenty-One game!'
-    puts "If you go over 21, it's a 'bust' and you lose."
-    puts
+  def game_end
+    centered "Thank you for playing Twenty-One today! Hope you had a good time!"
+    empty_line
   end
 
-  def show_score
-    puts "Current score: Player #{score[0]} x #{score[1]} Dealer."
-    puts
+  def play_again?
+    centered "Would you like to play again? (y/n)"
+    choice = validate_user_input('y', 'n')
+    choice == 'y'
   end
 
-  def compute_score
-    if someone_busted?
-      compute_busted_score
-    elsif player.total > dealer.total
-      score[0] += 1
-    elsif player.total < dealer.total
-      score[1] += 1
+  def show_result
+    if player.busted?
+      centered "Looks like #{player.name} busted! #{dealer.name} wins!"
+    elsif dealer.busted?
+      centered "Looks like #{dealer.name} busted! #{player.name} wins!"
     end
   end
 
-  def compute_busted_score
-    score[0] += 1 if dealer.busted?
-    score[1] += 1 if player.busted?
-  end
-
-  def someone_busted?
+  def anyone_busted?
     player.busted? || dealer.busted?
   end
 
-  def goodbye_message
-    puts
-    puts "Thanks for playing TwentyOne! See ya!"
+  def compare_cards
+    centered "It's now time to compare the cards..."
+    empty_line
+    player.show_all_hand
+    dealer.show_all_hand
+    cadence_pause
+    declare_winner
   end
 
-  def deal_cards
-    2.times do
-      player.hand << deck.deal
-      dealer.hand << deck.deal
+  def declare_winner
+    participants = [player, dealer]
+    participants.sort_by!(&:total)
+    if participants.map(&:total).uniq.size == 1
+      centered "It's a tie..."
+    else
+      centered "Looks like #{participants[1].name} wins!"
     end
-  end
-
-  def show_initial_cards
-    puts "Dealer has: #{dealer.hand[0]} and unknown card."
-    show_player_cards
-  end
-
-  def show_player_cards
-    puts "You have: #{player.show_hand}. Your total is #{player.total}."
-  end
-
-  def show_dealer_cards
-    puts "Dealer has: #{dealer.show_hand}. His total is #{dealer.total}"
-  end
-
-  def player_turn
-    loop do
-      puts '(H)it or (S)tay?'
-      answer = check_validity('h', 's')
-      if answer.start_with?('h')
-        player_hit(deck)
-      end
-      break if answer.start_with?('s') || player.busted?
-    end
-    puts "You got busted!" if player.busted?
-    puts
-  end
-
-  def player_hit(deck)
-    player.hit(deck)
-    show_player_cards
   end
 
   def dealer_turn
-    puts "Now it's the dealer's turn!"
-    dealer_play(dealer.total)
-    puts "Dealer busted! You win!" if dealer.busted?
-    puts
-    dealer.stay unless dealer.busted?
+    puts "#{dealer.name}'s turn..."
+    dealer_hit_or_stay
   end
 
-  def dealer_play(total)
-    while total < 17
-      puts "Dealer total is less than 17, he decides to hit..."
-      dealer.hit(deck)
-      show_dealer_cards
-      sleep 1.3
-      total = dealer.total
+  def dealer_hit_or_stay
+    loop do
+      break if dealer.stay?
+      dealer.hit_and_show_hand(deck)
+      press_enter
+      break if dealer.busted?
     end
+    dealer.busted? || dealer.stay
   end
 
-  def compare_cards
-    puts "It is now time to compare the cards..."
-    sleep 1.3
-    show_player_cards
-    sleep 1.3
-    show_dealer_cards
-    sleep 1.3
-    results
-    puts
+  def player_turn
+    puts "#{player.name}'s turn..."
+    player_hit_or_stay
   end
 
-  def results
-    if player.total > dealer.total
-      puts "You won!"
-    elsif player.total < dealer.total
-      puts "You lost!"
-    else
-      puts "It's a tie..."
+  def player_hit_or_stay
+    loop do
+      puts "Would you like to (h)it or (s)tay?"
+      choice = validate_user_input('h', 's')
+      break if choice == 's'
+      player.hit_and_show_hand(deck)
+      break if player.busted?
     end
+    player.busted? || player.stay
   end
-  sleep 1.3
+
+  def deal_cards
+    2.times { player.cards << deck.deal }
+    2.times { dealer.cards << deck.deal }
+  end
+
+  def show_initial_cards
+    clear_screen
+    player.show_all_hand
+    empty_line
+    dealer.show_partial_hand
+  end
+
+  def display_welcome_message
+    clear_screen
+    centered "Welcome to the Twenty-one Game!"
+    empty_line
+  end
+
+  def assign_names
+    centered "May I have your name please?"
+    user_name = check_for_emptiness
+    self.player = Player.new(user_name)
+    self.dealer = Dealer.new(Dealer::CHARACTERS.sample)
+  end
+
+  def acknowledge_game_setup
+    empty_line
+    centered "Alright #{player.name}, you will be the player and \
+#{dealer.name} the dealer in this twenty-one game."
+    centered "Let's have a clean game and may the best win!"
+    press_enter
+  end
 end
 
 Game.new.start
