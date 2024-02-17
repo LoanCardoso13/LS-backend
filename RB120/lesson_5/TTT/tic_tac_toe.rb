@@ -158,10 +158,12 @@ class Player
 end
 
 class Human < Player
+  include Validatable
+
   def marks(board)
     puts "Please choose a square: #{joinor(board.empty_squares)}"
-    user_choice = validate_user_choice(board)
-    board[user_choice] = marker
+    user_choice = validate_user_input(*board.empty_squares.map(&:to_s))
+    board[user_choice.to_i] = marker
   end
 
   def joinor(array)
@@ -170,16 +172,6 @@ class Human < Player
     else
       array[0]
     end
-  end
-
-  def validate_user_choice(board)
-    square = nil
-    loop do
-      square = gets.chomp
-      break if board.empty_squares.include?(square.to_i)
-      puts "Sorry, invalid input. Please choose a number from above."
-    end
-    square.to_i
   end
 end
 
@@ -196,75 +188,145 @@ class Computer < Player
       return 5
     end
 
-    if offensive_move?(board)
-      return offensive_move(board)
-    elsif defensive_move?(board)
-      return defensive_move(board)
-    end
+    critical_moves = sequences_to_complete(board)
+    offensive_move = sequences_to_complete(board)
+                     .select { |_, mark| mark == marker }
+    # It is imperative to ensure the whole board has been checked for
+    # a chance to win before checking for a chance to avoid losing:
+    return offensive_move.flatten[0] unless offensive_move.empty?
+    return critical_moves[0][0] unless critical_moves.empty?
+    # The #empty? guard clause ensures the method chains won't break
+    # if a nil value is found
+
     board.empty_squares.sample
   end
 
-  def offensive_move(board)
-    # iterate through winning sequences
-    # if a sequence has 2 marks from self and an empty square
-    # return the position of that empty square
-
+  # This method returns an array containing sub-arrays of pairs of values
+  # It is designed to find critical squares, i.e. squares representing
+  # within a winning sequence, either:
+  # A chance to win: 1 empty square and 2 marked by self/computer
+  # A threat to lose: 1 empty square and 2 marked by opponent/player
+  # Each pair of values corresponds to 1 critical square instance
+  # The first value is the position of the critical/empty square
+  # The second value is the marker of the other squares in the sequence
+  def sequences_to_complete(board)
+    answer = []
     Board::WINNING_SEQUENCES.each do |seq|
-      if seq.count { |pos| board[pos] == marker } == 2 &&
-         seq.map { |pos| board[pos] }.include?(Square::INITIAL_MARKER)
-        return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
+      empty_seq = seq.intersection(board.empty_squares)
+      if empty_seq.size == 1 &&
+         seq.map { |pos| board[pos] }.uniq.size == 2
+        answer << [empty_seq[0], (seq - empty_seq).map { |pos| board[pos] }[0]]
       end
     end
-    nil
-  end
-
-  def offensive_move?(board)
-    !!offensive_move(board)
-  end
-
-  def defensive_move(board)
-    # iterate through winning sequences
-    # if a sequence has 1 empty square and only 1 other type of marker
-    # return the position of that empty square
-
-    Board::WINNING_SEQUENCES.each do |seq|
-      if seq.map { |pos| board[pos] }.uniq.size == 2 &&
-         seq.count { |pos| board[pos] == Square::INITIAL_MARKER } == 1
-        return seq.select { |pos| board[pos] == Square::INITIAL_MARKER }[0]
-      end
-    end
-    nil
-  end
-
-  def defensive_move?(board)
-    !!defensive_move(board)
+    answer
   end
 end
 
 class GameEngine
+  ALPHABET = ('A'..'Z').to_a
+
   include Validatable, Displayable
 
   attr_reader :board
-  attr_accessor :player1, :player2
+  attr_accessor :player1, :player2, :user, :computer
 
   def initialize
     reset
+    @user = Player.new(nil, nil)
+    @computer = Player.new(nil, nil)
   end
 
-  def reset
-    @board = Board.new
+  def play
+    game_setup
+    main_game
+    empty_line
+    announce_main_game_winner
+    display_goodbye_message
+    empty_line
   end
+
+  private
 
   def game_setup
     clear_screen
     display_welcome_message
-    user_name, computer_name = name_participants
+    name_participants
     empty_line
-    user_marker, computer_marker = define_markers
-    define_order_of_players(user_name, computer_name,
-                            user_marker, computer_marker)
+    define_markers
+    define_order_of_players(user.name, computer.name,
+                            user.marker, computer.marker)
     empty_line
     acknowledge_players
+  end
+
+  def main_game
+    loop do
+      clear_and_display_game
+      players_board_interactions
+      display_result
+      break unless play_again?
+      reset
+    end
+  end
+
+  def announce_main_game_winner
+    if player1.score > player2.score
+      centered "#{player1.name} has won the game!"
+    elsif player1.score < player2.score
+      centered "#{player2.name} has won the game!"
+    end
+  end
+
+  def display_goodbye_message
+    centered "Thanks for playing Tic Tac Toe!"
+  end
+
+  def display_welcome_message
+    centered "Welcome to Tic Tac Toe!"
+    empty_line
+  end
+
+  def name_participants
+    centered "To start things off, may I have your name please?"
+    user.name = check_if_empty_user_input
+    computer.name = Computer::CHARACTERS.sample
+  end
+
+  def define_markers
+    centered "What marker would you like to use?"
+    centered "Please choose among uppercase characters (A-Z)."
+    user.marker = validate_user_input(*ALPHABET)
+    empty_line
+    centered "And what marker will you choose to your adversary? (A-Z)"
+    computer.marker = validate_user_input(*ALPHABET)
+    computer.marker = try_again(ALPHABET) until user.marker != computer.marker
+  end
+
+  def define_order_of_players(user_name, computer_name,
+                              user_marker, computer_marker)
+    # Defaults to Computer as first player
+    self.player1 = Computer.new(computer_name, computer_marker)
+    self.player2 = Human.new(user_name, user_marker)
+    ask_who_goes_first
+    choice = validate_user_input('c', 'p', 'r')
+    # Change order of players in case user choice demands it
+    change_order_of_players(user_name, computer_name,
+                            user_marker, computer_marker, choice)
+  end
+
+  def acknowledge_players
+    puts "Okay, this will be a match of\
+ #{player1.name} against #{player2.name}."
+    puts "#{player1.name} will start."
+    press_enter(BAR_SIZE)
+  end
+
+  def clear_and_display_game
+    clear_screen
+    empty_line
+    display_participants
+    board.display
+    display_score
   end
 
   def players_board_interactions
@@ -285,90 +347,14 @@ class GameEngine
     empty_line
   end
 
-  def main_game
-    loop do
-      clear_and_display_game
-      players_board_interactions
-      display_result
-      break unless play_again?
-      reset
-    end
-  end
-
-  def play
-    game_setup
-    main_game
-    empty_line
-    announce_main_game_winner
-    display_goodbye_message
-    empty_line
-  end
-
-  def display_welcome_message
-    centered "Welcome to Tic Tac Toe!"
-    empty_line
-  end
-
-  def display_goodbye_message
-    centered "Thanks for playing Tic Tac Toe!"
-  end
-
-  def announce_main_game_winner
-    if player1.score > player2.score
-      centered "#{player1.name} has won the game!"
-    elsif player1.score < player2.score
-      centered "#{player2.name} has won the game!"
-    end
-  end
-
-  def clear_and_display_game
-    clear_screen
-    empty_line
-    display_participants
-    board.display
-    display_score
-  end
-
   def display_participants
     centered "#{player1.name} is #{player1.marker},\
  #{player2.name} is #{player2.marker}."
   end
 
-  def name_participants
-    centered "To start things off, may I have your name please?"
-    user_name = check_if_empty_user_input
-    computer_name = Computer::CHARACTERS.sample
-    [user_name, computer_name]
-  end
-
-  def acknowledge_players
-    puts "Okay, this will be a match of\
- #{player1.name} against #{player2.name}."
-    puts "#{player1.name} will start."
-    press_enter(BAR_SIZE)
-  end
-
-  def define_markers
-    alphabet = ('A'..'Z').to_a
-    centered "What marker would you like to use?"
-    centered "Please choose among uppercase characters (A-Z)."
-    user_marker = validate_user_input(*alphabet)
-    empty_line
-    centered "And what marker will you choose to your adversary? (A-Z)"
-    computer_marker = validate_user_input(*alphabet)
-    [user_marker, computer_marker]
-  end
-
-  def define_order_of_players(user_name, computer_name,
-                              user_marker, computer_marker)
-    # Defaults to Computer as first player
-    self.player1 = Computer.new(computer_name, computer_marker)
-    self.player2 = Human.new(user_name, user_marker)
-    ask_who_goes_first
-    choice = validate_user_input('c', 'p', 'r')
-    # Change order of players in case user choice demands it
-    change_order_of_players(user_name, computer_name,
-                            user_marker, computer_marker, choice)
+  def try_again(alphabet)
+    centered "Sorry, markers can't be the same"
+    validate_user_input(*alphabet)
   end
 
   def change_order_of_players(user_name, computer_name,
@@ -391,6 +377,24 @@ class GameEngine
     self.player2 = random_order_players[1]
   end
 
+  def display_result
+    if board.someone_won?
+      print_winner_and_update_score(board.winner_marker)
+    else
+      puts "It's a tie..."
+    end
+  end
+
+  def play_again?
+    puts "Would you like to play again? (y/n)"
+    answer = validate_user_input('y', 'n')
+    answer == 'y'
+  end
+
+  def reset
+    @board = Board.new
+  end
+
   def ask_who_goes_first
     empty_line
     centered "Who should play first?"
@@ -398,14 +402,6 @@ class GameEngine
     centered "(p) for Player"
     centered "(r) for Random"
     empty_line
-  end
-
-  def display_result
-    if board.someone_won?
-      print_winner_and_update_score(board.winner_marker)
-    else
-      puts "It's a tie..."
-    end
   end
 
   def print_winner_and_update_score(marker)
@@ -417,12 +413,6 @@ class GameEngine
       puts "#{player2.name} is the winner!"
       player2.score += 1
     end
-  end
-
-  def play_again?
-    puts "Would you like to play again? (y/n)"
-    answer = validate_user_input('y', 'n')
-    answer == 'y'
   end
 end
 
