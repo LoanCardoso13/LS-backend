@@ -200,18 +200,18 @@ class Game
   attr_accessor :player, :dealer
 
   def game_setup
-    display_welcome_message
+    clear_and_display_welcome_message
     assign_names
     acknowledge_game_setup
   end
 
   def main
     deal_cards
-    show_initial_cards
+    clear_and_show_initial_cards
     player_turn
     player.busted? || dealer_turn
     anyone_busted? || compare_cards
-    show_result if anyone_busted?
+    show_who_got_busted if anyone_busted?
   end
 
   def game_end
@@ -225,12 +225,10 @@ class Game
     choice == 'y'
   end
 
-  def show_result
-    if player.busted?
-      centered "Looks like #{player.name} busted! #{dealer.name} wins!"
-    elsif dealer.busted?
-      centered "Looks like #{dealer.name} busted! #{player.name} wins!"
-    end
+  def show_who_got_busted
+    busted_name = player.busted? ? player.name : dealer.name
+    winner_name = dealer.busted? ? player.name : dealer.name
+    centered "Looks like #{busted_name} busted! #{winner_name} wins!"
   end
 
   def anyone_busted?
@@ -241,6 +239,7 @@ class Game
     centered "It's now time to compare the cards..."
     empty_line
     player.show_all_hand
+    cadence_pause
     dealer.show_all_hand
     cadence_pause
     declare_winner
@@ -292,14 +291,14 @@ class Game
     2.times { dealer.cards << deck.deal }
   end
 
-  def show_initial_cards
+  def clear_and_show_initial_cards
     clear_screen
     player.show_all_hand
     empty_line
     dealer.show_partial_hand
   end
 
-  def display_welcome_message
+  def clear_and_display_welcome_message
     clear_screen
     centered "Welcome to the Twenty-one Game!"
     empty_line
