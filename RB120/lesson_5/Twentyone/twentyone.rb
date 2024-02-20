@@ -1,3 +1,4 @@
+# rubocop:disable Layout/LineLength
 module Rules
   def rules1
     centered "The game consists of a 'dealer' and a 'player'."
@@ -50,6 +51,7 @@ module Rules
     centered "A hand can have aces worth different values."
   end
 end
+# rubocop:enable Layout/LineLength
 
 module GameMessages
   include Rules
@@ -184,6 +186,8 @@ module Displayable
 end
 
 module Hand
+  include Displayable
+
   def busted?
     total > 21
   end
@@ -198,7 +202,7 @@ module Hand
     cards.each do |card|
       sum += if face_value?(card)
                card.rank.to_i
-             elsif card.rank == 'Ace'
+             elsif card.rank == 'A'
                11
              else
                10
@@ -212,12 +216,34 @@ module Hand
   end
 
   def correct_for_aces(sum)
-    cards.count { |card| card.rank == 'Ace' }.times do
+    cards.count { |card| card.rank == 'A' }.times do
       break if sum <= 21
       sum -= 10
     end
     sum
   end
+
+  # rubocop:disable Metrics/AbcSize
+  def display_cards
+    puts([
+      "+-----+ " * cards.size,
+      cards.map { |card| "|#{card.suit.ljust(5)}|" }.join(' '),
+      cards.map { |card| "|#{card.rank.center(5)}|" }.join(' '),
+      cards.map { |card| "|#{card.suit.rjust(5)}|" }.join(' '),
+      "+-----+ " * cards.size
+    ].map { |line| line.center(Displayable::BAR_SIZE) })
+  end
+
+  def display_but_one_card
+    puts([
+      "+-----+ " * 2,
+      "|#{cards[0].suit.ljust(5)}| |?    |",
+      "|#{cards[0].rank.center(5)}| |  ?  |",
+      "|#{cards[0].suit.rjust(5)}| |    ?|",
+      "+-----+ " * 2
+    ].map { |line| line.center(Displayable::BAR_SIZE) })
+  end
+  # rubocop:enable Metrics/AbcSize
 end
 
 class Participant
@@ -245,11 +271,9 @@ class Participant
 
   def show_all_hand
     shifted "---- #{name}'s hand ----"
-    cards.each do |card|
-      shifted "=> #{card}"
-    end
-    shifted "=> total: #{total}"
+    display_cards
     empty_line
+    centered "total: #{total}"
   end
 end
 
@@ -285,15 +309,15 @@ class Dealer < Participant
 
   def show_partial_hand
     shifted "---- #{name}'s hand ----"
-    shifted "=> #{cards[0]}"
-    shifted "=> ???"
+    display_but_one_card
     empty_line
+    centered "total: ???"
   end
 end
 
 class Deck
-  SUITS = %w(Clubs Diamonds Hearts Spades)
-  RANKS = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace)
+  SUITS = ['H', 'D', 'S', 'C']
+  RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
   attr_reader :cards
 
@@ -321,7 +345,12 @@ class Card
   end
 
   def to_s
-    "#{rank} of #{suit}"
+    # "#{rank} of #{suit}"
+    ["+-----+",
+     "|#{suit.ljust(5)}|",
+     "|#{rank.center(5)}|",
+     "|#{suit.rjust(5)}|",
+     "+-----+"].join("\n")
   end
 end
 
@@ -358,6 +387,7 @@ class Game
     clear_and_display_welcome_message
     display_rules if see_rules?
     assign_names
+    @@participants = [player, dealer]
     acknowledge_game_setup
   end
 
@@ -395,21 +425,20 @@ class Game
     comparing_cards_message
     cadence_pause
     clear_screen
-    empty_line
-    player.show_all_hand
-    cadence_pause
-    dealer.show_all_hand
-    cadence_pause
+    @@participants.each do |participant|
+      empty_line
+      participant.show_all_hand
+      cadence_pause
+    end
     declare_winner
   end
 
   def declare_winner
-    participants = [player, dealer]
-    participants.sort_by!(&:total)
-    if participants.map(&:total).uniq.size == 1
+    @@participants.sort_by!(&:total)
+    if @@participants.map(&:total).uniq.size == 1
       tie_result_message
     else
-      name_winner_message(participants[1].name)
+      name_winner_message(@@participants[1].name)
     end
   end
 
