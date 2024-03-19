@@ -16,3 +16,13 @@
 
 =end
 
+def step(iniv, endv, stepv)
+  current_v = iniv
+  while current_v <= endv 
+    yield(current_v)
+    current_v += stepv
+  end
+  [ iniv, endv, stepv ]
+end
+
+step(1, 10, 3) { |value| puts "value = #{value}" }

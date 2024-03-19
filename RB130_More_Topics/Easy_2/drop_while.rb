@@ -18,3 +18,17 @@
 
 =end
 
+def drop_while(arr)
+  result = []
+  arr.size.times do |idx|
+    return arr[idx..] unless yield(arr[idx])
+  end
+  result
+end
+
+p  drop_while([1, 3, 5, 6]) { |value| value.odd? } == [6]
+p  drop_while([1, 3, 5, 6]) { |value| value.even? } == [1, 3, 5, 6]
+p  drop_while([1, 3, 5, 6]) { |value| true } == []
+p  drop_while([1, 3, 5, 6]) { |value| false } == [1, 3, 5, 6]
+p  drop_while([1, 3, 5, 6]) { |value| value < 5 } == [5, 6]
+p  drop_while([]) { |value| true } == []
