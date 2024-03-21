@@ -5,3 +5,12 @@
 
 =end
 
+require 'minitest/autorun'
+
+class MyClass < Minitest::Test
+
+  def test_raising
+    assert_raises(NoExperienceError)
+  end
+
+end

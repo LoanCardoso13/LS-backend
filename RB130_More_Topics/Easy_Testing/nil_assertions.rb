@@ -5,3 +5,13 @@
 
 =end
 
+require 'minitest/autorun'
+
+class MyClass < Minitest::Test
+
+  def test_nilly
+    value = ['not nil', nil ].sample
+    assert_nil(value, "Ops!")
+  end
+
+end

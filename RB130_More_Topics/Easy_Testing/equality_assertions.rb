@@ -5,3 +5,13 @@
 
 =end
 
+require 'minitest/autorun'
+
+class MyClass < Minitest::Test
+
+  def test_dc
+    value = 'XyZx'
+    assert_equal('xyz', value.downcase)
+  end
+
+end

@@ -5,3 +5,13 @@
 
 =end
 
+require 'minitest/autorun'
+
+class MyClass < Minitest::Test
+
+  def test_isa
+    value = [ 13, 13.0, Numeric.new ].sample
+    assert( value.is_a? Numeric )
+  end
+
+end

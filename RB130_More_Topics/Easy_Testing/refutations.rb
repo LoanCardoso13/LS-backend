@@ -5,3 +5,14 @@
 
 =end
 
+require 'minitest/autorun'
+
+class MyClass < Minitest::Test
+
+  def test_include
+    list = [['abc', 'efd'], ['xyz', 'lll']].sample
+    p list
+    refute(list.include? 'xyz')
+  end
+
+end

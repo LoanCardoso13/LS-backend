@@ -5,3 +5,21 @@
 
 =end
 
+require 'minitest/autorun'
+
+class List
+
+  def process
+    13
+  end
+
+end
+
+class MyClass < Minitest::Test
+
+  def test_objs
+    list = List.new
+    assert_equal(list, list.process)
+  end
+
+end
