@@ -41,3 +41,62 @@
 
 =end
 
+class Diamond
+
+  def self.make_diamond(limit_letter)
+    # Define side as (limit_letter.ord - 'A'.ord)*2 + 1
+    # Initialize answer local variable to empty array
+    # Initialize current_ascii to 'A'.ord
+    # Iterate over the following block with index starting from -1, steping 2 until reaches (side - 2)
+    #   let iteration index be defined as idx
+    #   content = If idx < 0
+    #     'A'
+    #   Else
+    #     current_ascii += 1
+    #     current_ascii.chr + ' '*idx + current_ascii.chr
+    #   Put your content at the center of a line made of side number of spaces and shove it into answer array
+    #
+    # Iterate over the following block with index starting from (side - 4), steping 2 until reaches -1
+    #   let iteration index be defined as idx
+    #   content = If idx < 0
+    #     'A'
+    #   Else
+    #     current_ascii -= 1
+    #     current_ascii.chr + ' '*idx + current_ascii.chr
+    #   Put your content at the center of a line made of side number of spaces and shove it into answer array
+    #
+    # Return answer array joined by new line
+
+    if limit_letter == 'A'
+      "A\n"
+    else
+      current_ascii = 'A'.ord
+      side = (limit_letter.ord - current_ascii)*2 + 1
+      answer = []
+
+      -1.step(by:2, to: (side - 2)) do |idx|
+        content = if idx < 0
+                    'A'
+                  else
+                    current_ascii += 1
+                    current_ascii.chr + ' '*idx + current_ascii.chr
+                  end
+        answer << content.center(side, ' ')
+      end
+
+      (side - 4).step(by: -2, to: -1) do |idx|
+        content = if idx < 0
+                    'A'
+                  else
+                    current_ascii -= 1
+                    current_ascii.chr + ' '*idx + current_ascii.chr
+                  end
+        answer << content.center(side, ' ')
+      end
+
+      answer.join("\n") + "\n"
+    end
+
+  end
+
+end
