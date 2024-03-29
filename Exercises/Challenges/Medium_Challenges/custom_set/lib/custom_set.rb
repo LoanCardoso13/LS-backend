@@ -11,3 +11,57 @@
 
 =end
 
+class CustomSet
+
+  def initialize(set = [])
+    @set = set
+  end
+
+  def empty?
+    set.empty?
+  end
+
+  def contains?(member)
+    set.include?(member)
+  end
+
+  def subset?(other)
+    return false if set.any? { |member| !other.set.include?(member) }
+    true
+  end
+
+  def disjoint?(other)
+    return false if set.any? { |member| other.set.include?(member) }
+    true
+  end
+
+  def eql?(other)
+    set.uniq.sort == other.set.uniq.sort
+  end
+  alias_method :==, :eql?
+
+  def add(number)
+    set.push(number)
+    self
+  end
+
+  def intersection(other)
+    common_arr = set.intersection other.set
+    CustomSet.new(common_arr)
+  end
+
+  def difference(other)
+    diff_arr = set.difference other.set
+    CustomSet.new(diff_arr)
+  end
+
+  def union(other)
+    union_arr = set.union other.set
+    CustomSet.new(union_arr)
+  end
+
+  protected
+  
+  attr_reader :set
+
+end

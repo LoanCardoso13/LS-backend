@@ -9,3 +9,83 @@
 
 =end
 
+class Element
+  attr_reader :datum, :next_element
+
+  def initialize(datum, next_element = nil)
+    @datum = datum
+    @next_element = next_element
+  end
+
+  def tail?
+    !next_element
+  end
+
+  def next
+    next_element
+  end
+
+end
+
+class SimpleLinkedList
+
+  def initialize
+    @container = []
+  end
+
+  def size
+    container.size
+  end
+
+  def empty?
+    self.size == 0
+  end
+
+  def push(datum)
+    if self.empty?
+      ele = Element.new(datum)
+      container.push(ele)
+    else
+      companion = self.head
+      ele = Element.new(datum, companion)
+      container.push(ele)
+    end
+  end
+
+  def peek
+    return nil unless container[-1]
+
+    container[-1].datum
+  end
+
+  def head
+    container[-1]
+  end
+
+  def pop
+    container.pop.datum
+  end
+
+  def self.from_a(arr)
+    arr = [] unless arr
+
+    new_list = self.new
+    arr.reverse.each { |datum| new_list.push(datum) }
+    new_list
+  end
+
+  def to_a
+    container.reverse.map(&:datum)
+  end
+
+  def reverse
+    new_list = self.class.new
+    container.reverse.each { |ele| new_list.push(ele.datum) }
+    new_list
+  end
+
+  private
+
+  attr_reader :container
+
+end
