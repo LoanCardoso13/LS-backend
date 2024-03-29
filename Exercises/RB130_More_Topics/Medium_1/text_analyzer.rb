@@ -38,9 +38,29 @@
   veniam dolor. Laboris cillum fugiat reprehenderit elit consequat ullamco veniam
   commodo.
 
+  Sample Output:
+
   3 paragraphs
   15 lines
   126 words
 
 =end
 
+
+class TextAnalyzer
+  def process
+    text = open('SampleText.txt', 'r').read
+    yield(text)
+  end
+end
+
+analyzer = TextAnalyzer.new
+analyzer.process do |text|
+  puts "#{text.split("\n\n").size} paragraphs"
+end
+analyzer.process do |text|
+  puts "#{text.split("\n").size} lines"
+end
+analyzer.process do |text|
+  puts "#{text.split.size} words"
+end

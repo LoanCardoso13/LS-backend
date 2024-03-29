@@ -27,3 +27,8 @@
 
 =end
 
+def my_method(arr)
+  yield(arr)
+end
+
+my_method(%w(raven finch hawk eagle)) { |_, _, *raptors| p raptors }
