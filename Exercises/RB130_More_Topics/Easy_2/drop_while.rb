@@ -19,11 +19,10 @@
 =end
 
 def drop_while(arr)
-  result = []
   arr.size.times do |idx|
     return arr[idx..] unless yield(arr[idx])
   end
-  result
+  []
 end
 
 p  drop_while([1, 3, 5, 6]) { |value| value.odd? } == [6]

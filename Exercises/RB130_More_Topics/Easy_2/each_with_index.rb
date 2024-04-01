@@ -28,7 +28,6 @@ def each_with_index(arr)
     yield(ele, counter)
     counter += 1
   end
-  arr
 end
 
 result = each_with_index([1, 3, 6]) do |value, index|

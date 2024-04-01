@@ -29,7 +29,7 @@ def one?(arr)
     count += 1 if yield(ele)
     return false if count > 1
   end
-  count == 1 ? true : false
+  count == 1
 end
 
 p  one?([1, 3, 5, 6]) { |value| value.even? } == true    # -> true
