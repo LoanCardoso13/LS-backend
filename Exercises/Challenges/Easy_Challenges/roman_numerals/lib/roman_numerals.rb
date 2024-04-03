@@ -85,3 +85,35 @@ class RomanNumeral
   end
 
 end
+
+
+class RomanNumeral_2
+  attr_reader :arabic
+
+  CONVERSION_TABLE = {
+    '1' => ['I', 'X', 'C', 'M'],
+    '2' => ['II', 'XX', 'CC', 'MM'],
+    '3' => ['III', 'XXX', 'CCC', 'MMM'],
+    '4' => ['IV', 'XL', 'CD'],
+    '5' => ['V', 'L', 'D'],
+    '6' => ['VI', 'LX', 'DX'],
+    '7' => ['VII', 'LXX', 'DXX'],
+    '8' => ['VIII', 'LXXX', 'DXXX'],
+    '9' => ['IX', 'XC', 'CM']
+  }
+
+  def initialize(arabic)
+    @arabic = arabic.to_s
+  end
+
+  def to_roman
+    magnitude = arabic.size - 1
+    answer = ''
+    arabic.chars.each do |decimal_digit|
+      answer << CONVERSION_TABLE[decimal_digit][magnitude] unless decimal_digit == '0'
+      magnitude -= 1
+    end
+    answer
+  end
+
+end

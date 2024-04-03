@@ -19,44 +19,41 @@
 class Meetup
   attr_reader :year, :month
 
-  SCHEDULE_TO_LIMIT = {
-    'first' => 1,
-    'second' => 2,
-    'third' => 3,
-    'fourth' => 4,
-    'fifth' => 5,
-    'last' => :backwards,
-    'teenth' => :teenth
-  }
-
   def initialize(year, month)
     @year = year
     @month = month
   end
 
-  def day(weekday_unfiltered, schedule)
-    limit = SCHEDULE_TO_LIMIT[schedule.downcase]
-    weekday = weekday_unfiltered.downcase
-    initial_date = Date.new(year, month)
-    terminal_date = Date.new(year, month, -1)
-    count = 0
+  def day(weekday, position)
+    weekday = weekday.downcase
+    weekday_call = (weekday + '?').to_sym
+    position = position.downcase
+    matching_dates = []
 
-    initial_date.step(terminal_date) do |date|
-      count += 1 if date.send (weekday + '?').to_sym
-      return date if count == limit
+    Date.new(year, month).upto(Date.new(year, month, -1)) do |day|
+      matching_dates << day if day.send weekday_call
     end
 
-    if limit == :backwards
-      terminal_date.step(initial_date, -1) do |date|
-        return date if date.send (weekday + '?').to_sym
-      end
-    elsif limit == :teenth
-      (initial_date + 12).step(initial_date + 18) do |date|
-        return date if ( date.send (weekday + '?').to_sym )
+    if position == 'teenth'
+      matching_dates.each do |date|
+        return date if (13..19).include?(date.day)
       end
     end
 
-    nil
+    case position
+    when 'first'
+      matching_dates.first
+    when 'second'
+      matching_dates[1]
+    when 'third'
+      matching_dates[2]
+    when 'fourth'
+      matching_dates[3]
+    when 'fifth'
+      matching_dates[4]
+    when 'last'
+      matching_dates[-1]
+    end
   end
 
 end

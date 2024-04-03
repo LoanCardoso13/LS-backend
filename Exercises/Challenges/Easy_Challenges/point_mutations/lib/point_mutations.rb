@@ -28,12 +28,12 @@ class DNA
     @strand = strand
   end
 
-  def hamming_distance(distance)
-    min_len = [ strand.length, distance.length ].min
-    new_strand = strand[0, min_len]
-    new_distance = distance[0, min_len]
+  def hamming_distance(other_strand)
+    min_len = [ strand.length, other_strand.length ].min
+    sample_1 = strand[0, min_len]
+    sample_2 = other_strand[0, min_len]
     count = 0
-    new_strand.size.times { |idx| count += 1 if strand[idx] != new_distance[idx] }
+    sample_1.size.times { |idx| count += 1 if strand[idx] != sample_2[idx] }
     count
   end
 
