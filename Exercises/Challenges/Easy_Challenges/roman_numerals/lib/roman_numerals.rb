@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write some code that converts modern decimal numbers into their Roman number equivalents.
@@ -31,31 +30,13 @@
 class RomanNumeral
   attr_reader :arabic
 
-  ROMAN_NUMERALS = [ 'I', 'V', 'X', 'L', 'C', 'D', 'M']
+  ROMAN_NUMERALS = ['I', 'V', 'X', 'L', 'C', 'D', 'M']
 
   def initialize(arabic)
     @arabic = arabic
   end
 
   def to_roman
-    # Transform arabic number into its digits organized in an array
-    # Initialize empty answer String
-    # Initialize local variable pos to 1
-    # Iterate through each digit 
-    #   Add return value of conversion method, with arguments pos and digit, onto answer String
-    #   Increase pos by 2
-    # Return answer String
-    #
-    # Conversion method
-    #   Case digit less than 4
-    #     multiply digit by Roman at -pos
-    #   Case digit 4
-    #     Sum Romans from -pos and -(pos - 1)
-    #   Case digit 5 through 8
-    #     Roman from -(pos - 1) plus (digit - 5) times Roman from -pos
-    #   Case digit 9
-    #     Sum Roman from -(pos - 1) and -(pos - 2)
-    
     arabic_digits = arabic.digits.reverse
     # Just to make sure to always have exactly 4 digits:
     while arabic_digits.size < 4
@@ -78,16 +59,14 @@ class RomanNumeral
     when 4
       ROMAN_NUMERALS[-p] + ROMAN_NUMERALS[-(p - 1)]
     when 5..8
-      ROMAN_NUMERALS[-(p - 1)] + ROMAN_NUMERALS[-p] * (d - 5)
+      ROMAN_NUMERALS[-(p - 1)] + (ROMAN_NUMERALS[-p] * (d - 5))
     when 9
       ROMAN_NUMERALS[-p] + ROMAN_NUMERALS[-(p - 2)]
     end
   end
-
 end
 
-
-class RomanNumeral_2
+class RomanNumeral2
   attr_reader :arabic
 
   CONVERSION_TABLE = {
@@ -107,13 +86,12 @@ class RomanNumeral_2
   end
 
   def to_roman
-    magnitude = arabic.size - 1
+    mag = arabic.size - 1
     answer = ''
     arabic.chars.each do |decimal_digit|
-      answer << CONVERSION_TABLE[decimal_digit][magnitude] unless decimal_digit == '0'
-      magnitude -= 1
+      answer << CONVERSION_TABLE[decimal_digit][mag] unless decimal_digit == '0'
+      mag -= 1
     end
     answer
   end
-
 end

@@ -1,4 +1,3 @@
-# rubocop:disable all
 require 'minitest/autorun'
 require_relative '../lib/diamond'
 

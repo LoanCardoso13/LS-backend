@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a simple linked list implementation. The linked list is a fundamental data structure in computer science, often used in the implementation of other data structures.
@@ -24,11 +23,9 @@ class Element
   def next
     next_element
   end
-
 end
 
 class SimpleLinkedList
-
   def initialize
     @container = []
   end
@@ -42,14 +39,13 @@ class SimpleLinkedList
   end
 
   def push(datum)
-    if self.empty?
+    if empty?
       ele = Element.new(datum)
-      container.push(ele)
     else
-      companion = self.head
+      companion = head
       ele = Element.new(datum, companion)
-      container.push(ele)
     end
+    container.push(ele)
   end
 
   def peek
@@ -67,9 +63,9 @@ class SimpleLinkedList
   end
 
   def self.from_a(arr)
-    arr = [] unless arr
+    arr ||= []
 
-    new_list = self.new
+    new_list = new
     arr.reverse.each { |datum| new_list.push(datum) }
     new_list
   end
@@ -87,5 +83,4 @@ class SimpleLinkedList
   private
 
   attr_reader :container
-
 end

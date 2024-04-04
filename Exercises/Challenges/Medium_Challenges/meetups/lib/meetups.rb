@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Meetups are a great way to meet people who share a common interest. Typically, meetups happen monthly on the same day of the week. For example, a meetup's meeting may be set as:
@@ -26,7 +25,7 @@ class Meetup
 
   def day(weekday, position)
     weekday = weekday.downcase
-    weekday_call = (weekday + '?').to_sym
+    weekday_call = ("#{weekday}?").to_sym
     position = position.downcase
     matching_dates = []
 
@@ -55,5 +54,4 @@ class Meetup
       matching_dates[-1]
     end
   end
-
 end

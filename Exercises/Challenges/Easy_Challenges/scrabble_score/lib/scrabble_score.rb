@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that, given a word, computes the Scrabble score for that word.
@@ -38,7 +37,7 @@
 class Scrabble
   attr_reader :word
 
-  SCORE_TABLE = { 
+  SCORE_TABLE = {
     ['A', 'E', 'I', 'O', 'U', 'L', 'N', 'R', 'S', 'T'] => 1,
     ['D', 'G'] => 2,
     ['B', 'C', 'M', 'P'] => 3,
@@ -49,18 +48,18 @@ class Scrabble
   }
 
   def self.score(word)
-  total = 0
-  word = word.strip.upcase
-  word.chars.each do |letter|
-    SCORE_TABLE.keys.each do |letters_array|
-      total += SCORE_TABLE[letters_array] if letters_array.include?(letter)
+    total = 0
+    word = word.strip.upcase
+    word.chars.each do |letter|
+      SCORE_TABLE.keys.each do |letters_array|
+        total += SCORE_TABLE[letters_array] if letters_array.include?(letter)
+      end
     end
-  end
-  total
+    total
   end
 
   def initialize(word)
-    word = '' unless word
+    word ||= ''
     @word = word.strip.upcase
   end
 
@@ -73,5 +72,4 @@ class Scrabble
     end
     total
   end
-
 end

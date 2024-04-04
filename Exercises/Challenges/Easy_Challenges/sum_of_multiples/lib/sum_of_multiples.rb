@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that, given a natural number and a set of one or more other numbers, can find the sum of all the multiples of the numbers in the set that are less than the first number. If the set of numbers is not given, use a default set of 3 and 5.
@@ -44,5 +43,4 @@ class SumOfMultiples
     answer.uniq!
     answer.sum
   end
-
 end

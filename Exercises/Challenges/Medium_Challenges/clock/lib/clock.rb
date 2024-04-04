@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Create a clock that is independent of date.
@@ -12,55 +11,58 @@
 =end
 
 class Clock
-
-  def self.at(hour, minutes = 0)
-    Time.new(hour, minutes)  
+  def self.at(hours, minutes = 0)
+    new(hours, minutes)
   end
 
-end
-
-class Time
-
-  def initialize(hour, minutes)
-    @hour = hour
+  def initialize(hours, minutes = 0)
+    @hours = hours
     @minutes = minutes
   end
 
   def to_s
-    format('%.2d:%.2d', hour, minutes)
+    format("%.2d:%.2d", hours, minutes)
   end
 
-  def +(added_minutes)
-    new_minutes = (minutes + added_minutes) % 60
-    new_hour = (minutes + added_minutes) / 60 + hour
-    new_hour = new_hour % 24
+  def +(minutes)
+    hours = minutes / 60
+    minutes %= 60
 
-    Time.new(new_hour, new_minutes)
+    new_minutes = self.minutes + minutes
+    hours += 1 if new_minutes / 60 > 0
+    new_minutes %= 60
+
+    new_hours = self.hours + hours
+    new_hours %= 24
+
+    Clock.at(new_hours, new_minutes)
   end
 
-  def -(subtracted_minutes)
+  def -(minutes)
+    current_minutes = (hours * 60) + self.minutes
+    new_minutes = current_minutes - minutes
 
-    new_hour = hour - (subtracted_minutes / 60)
-    new_minutes = minutes - subtracted_minutes % 60
+    if new_minutes >= 0
+      new_minutes %= 24 * 60
+      new_hours = new_minutes / 60
+      new_minutes %= 60
 
-    if new_minutes < 0
-      new_hour -= 1
-      new_minutes = 60 + new_minutes
+    else
+      new_minutes = new_minutes.abs % (24 * 60)
+      new_minutes = (24 * 60) - new_minutes
+      new_hours = new_minutes / 60
+      new_minutes %= 60
+
     end
-    if new_hour < 0
-      new_hour = ((-1) * new_hour) % 24
-      new_hour = 24 - new_hour
-    end
 
-    Time.new(new_hour, new_minutes)
+    Clock.at(new_hours, new_minutes)
   end
 
-  def ==(other_time)
-    self.hour == other_time.hour && self.minutes == other_time.minutes
+  def ==(other_clock)
+    hours == other_clock.hours && minutes == other_clock.minutes
   end
 
   protected
 
-  attr_reader :hour, :minutes
-
+  attr_reader :hours, :minutes
 end

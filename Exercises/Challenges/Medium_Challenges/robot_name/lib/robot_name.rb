@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that manages robot factory settings.
@@ -31,5 +30,4 @@ class Robot
       @@names_created << candidate_name
     end
   end
-
 end

@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that can generate the lyrics of the 99 Bottles of Beer song. See the test suite for the entire song.
@@ -6,7 +5,6 @@
 =end
 
 class BeerSong
-
   def self.verse(number)
     if number > 1
       "#{number} #{number == 1 ? 'bottle' : 'bottles'} of beer on the wall, #{number} #{number == 1 ? 'bottle' : 'bottles'} of beer.\n" \
@@ -27,5 +25,4 @@ class BeerSong
   def self.lyrics
     BeerSong.verses(99, 0)
   end
-
 end

@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that will take a string of digits and return all the possible consecutive number series of a specified length in that string.
@@ -32,5 +31,4 @@ class Series
     end
     answer
   end
-
 end

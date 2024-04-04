@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Implement octal to decimal conversion. Given an octal input string, your program should produce a decimal output. Treat invalid input as octal 0.
@@ -55,9 +54,8 @@ class Octal
     answer = 0
     octal.reverse!
     octal.size.times do |idx|
-      answer += octal[idx].to_i * 8**(idx)
+      answer += octal[idx].to_i * (8**(idx))
     end
     answer
   end
-
 end

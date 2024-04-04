@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   The Greek mathematician Nicomachus devised a classification scheme for natural numbers (1, 2, 3, ...), identifying each as belonging uniquely to the categories of abundant, perfect, or deficient based on a comparison between the number and the sum of its positive divisors (the numbers that can be evenly divided into the target number with no remainder, excluding the number itself). For instance, the positive divisors of 15 are 1, 3, and 5. This sum is known as the Aliquot sum.
@@ -18,12 +17,13 @@
 =end
 
 class PerfectNumber
-
   def self.classify(number)
     raise StandardError if number < 0
 
     divisors = []
-    (1...number).each { |candidate| divisors << candidate if number % candidate == 0 }
+    (1...number).each do |candidate|
+      divisors << candidate if number % candidate == 0
+    end
     if divisors.sum > number
       'abundant'
     elsif divisors.sum < number
@@ -32,5 +32,4 @@ class PerfectNumber
       'perfect'
     end
   end
-
 end

@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that takes a word and a list of possible anagrams and selects the correct sublist that contains the anagrams of the word.
@@ -17,8 +16,9 @@ class Anagram
   def match(arr)
     arr.reject! { |ele| ele.downcase == word.downcase }
     answer = []
-    arr.each { |candidate| answer << candidate if word.downcase.chars.sort == candidate.downcase.chars.sort }
+    arr.each do |candidate|
+      answer << candidate if word.downcase.chars.sort == candidate.downcase.chars.sort
+    end
     answer
   end
-
 end

@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Create a custom set type.
@@ -12,7 +11,6 @@
 =end
 
 class CustomSet
-
   def initialize(set = [])
     @set = set
   end
@@ -38,7 +36,7 @@ class CustomSet
   def eql?(other)
     set.uniq.sort == other.set.uniq.sort
   end
-  alias_method :==, :eql?
+  alias == eql?
 
   def add(number)
     set.push(number)
@@ -61,7 +59,6 @@ class CustomSet
   end
 
   protected
-  
-  attr_reader :set
 
+  attr_reader :set
 end

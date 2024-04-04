@@ -1,4 +1,3 @@
-# rubocop:disable all
 =begin
 
   Write a program that can calculate the Hamming distance between two DNA strands.
@@ -29,12 +28,11 @@ class DNA
   end
 
   def hamming_distance(other_strand)
-    min_len = [ strand.length, other_strand.length ].min
-    sample_1 = strand[0, min_len]
-    sample_2 = other_strand[0, min_len]
+    min_len = [strand.length, other_strand.length].min
+    sample1 = strand[0, min_len]
+    sample2 = other_strand[0, min_len]
     count = 0
-    sample_1.size.times { |idx| count += 1 if strand[idx] != sample_2[idx] }
+    sample1.size.times { |idx| count += 1 if strand[idx] != sample2[idx] }
     count
   end
-
 end
