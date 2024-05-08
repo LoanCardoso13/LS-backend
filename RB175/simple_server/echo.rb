@@ -6,7 +6,7 @@ server = TCPServer.new("localhost", 3003)
 def parse_request(request_line)
   http_method, full_path, version = request_line.split
   path, unparsed_params = full_path.split('?')
-  params = unparsed_params.split('&').each_with_object({}) do |pair, hsh|
+  params = (unparsed_params || "").split('&').each_with_object({}) do |pair, hsh|
     key, value = pair.split('=')
     hsh[key] = value
   end
