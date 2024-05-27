@@ -1,69 +1,43 @@
-# rubocop:disable all
 require "sinatra"
-require "sinatra/reloader"
+require "sinatra/reloader" if development?
 require "tilt/erubis"
 
+# GET index
+# GET chapters/:chp_id
+# GET search
+def in_paragraphs(raw_text)
+  raw_text.split("\n\n").map.with_index { |par, idx| "<p id='#{idx + 1}'>#{par}</p>" }.join
+end
+
+def find_term(searched_word)
+  @chp_titles.each_with_index do |title, chp_idx|
+    File.readlines("data/chp#{chp_idx + 1}.txt").each_with_index do |paragraph_content, par_idx|
+      
+    end
+  end
+end
+
 before do
-  @contents = File.readlines('data/toc.txt')
-end
-
-helpers do
-  def in_paragraphs(chp)
-    chp.split("\n\n").map.with_index { |par, idx| "<p id=#{idx}>#{par}</p>" }.join
-  end
-
-  def highlight_result(paragraph, searched)
-    paragraph.gsub(searched,"<strong>#{searched}</strong>")
-  end
-end
-
-not_found do
-  redirect "/"
+  @chp_titles = File.read('data/toc.txt').split("\n")
 end
 
 get "/" do
-  @title = 'The Adventures of Sherlock Holmes'
-
-  erb :home
+  erb :index
 end
 
-get "/chapters/:number" do
-  number = params[:number].to_i
-  chp_name = @contents[number - 1]
-
-  redirect "/" unless (1..@contents.size).cover? number
-
-  @title = "Chapter #{number}: #{chp_name}"
-  @chapter = File.read("data/chp#{number}.txt")
-
+get "/chapters/:chp_id" do
+  @chp_ref = params[:chp_id].to_i
+  @content = in_paragraphs File.read("data/chp#{@chp_ref}.txt")
   erb :chapter
 end
 
-def each_chapter
-  @contents.each_with_index do |name, idx|
-    number = idx + 1
-    paragraphs_arr = File.read("data/chp#{number}.txt").split("\n\n")
-    yield name, number, paragraphs_arr
-  end
-end
-
-def chapter_matching(query)
-  results = []
-
-  return results if !query || query.empty?
-
-  each_chapter do |name, number, paragraphs_arr|
-    matches = []
-    paragraphs_arr.each_with_index do |paragraph, idx|
-      matches << {content: paragraph, location: idx} if paragraph.include?(query)
-    end
-    results << {name:name, number:number, page:matches} unless matches.empty?
-  end
-
-  results
-end
-
 get "/search" do
-  @results = chapter_matching(params[:query])
+  @results = []
+  @searched_word = params[:query]
+  if @searched_word
+    @chp_titles.each_with_index do |title, idx|
+      @results << title if File.read("data/chp#{idx + 1}.txt").include? @searched_word
+    end
+  end
   erb :search
 end
