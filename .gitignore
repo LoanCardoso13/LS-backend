@@ -1,3 +1,5 @@
 *Gemfile*
 *Exercise_Material/
 *.bak
+*:Zone.Identifier
+.DS_Store
