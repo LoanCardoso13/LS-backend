@@ -8,9 +8,29 @@
 <% if @searched_word %>
   <h3>Results for: '<%= @searched_word %>'</h3>
 
+  <%# 
+      @results = {
+        "title" => {
+          par_idx => par_content
+          ...
+        }
+  }
+  %>
+
   <ul>
-    <% @results.each do |result| %>
-      <li><strong><%= result %></strong></li>
+    <% @results.each_with_index do |(title, paragraphs), chp_idx| %>
+      <% unless paragraphs.empty? %>
+        <li><strong><%= title %></strong></li>
+        <ul>
+          <% paragraphs.each do |par_idx, par_content| %>
+            <li>
+              <a href="chapters/<%= chp_idx + 1 %>#<%= par_idx %>">
+                <%= par_content %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
     <% end %>
   </ul>
 <% end %>

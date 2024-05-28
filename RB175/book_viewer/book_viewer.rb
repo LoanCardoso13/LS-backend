@@ -2,19 +2,22 @@ require "sinatra"
 require "sinatra/reloader" if development?
 require "tilt/erubis"
 
-# GET index
-# GET chapters/:chp_id
-# GET search
 def in_paragraphs(raw_text)
   raw_text.split("\n\n").map.with_index { |par, idx| "<p id='#{idx + 1}'>#{par}</p>" }.join
 end
 
 def find_term(searched_word)
+  result = {}
   @chp_titles.each_with_index do |title, chp_idx|
-    File.readlines("data/chp#{chp_idx + 1}.txt").each_with_index do |paragraph_content, par_idx|
-      
+    result[title] = {}
+    File.read("data/chp#{chp_idx + 1}.txt").split("\n\n").each_with_index do |par_content, par_idx|
+      if par_content.include? searched_word
+        par_content.gsub!(searched_word, "<b>#{searched_word}</b>")
+        result[title][par_idx + 1] = par_content
+      end
     end
   end
+  result
 end
 
 before do
@@ -32,12 +35,9 @@ get "/chapters/:chp_id" do
 end
 
 get "/search" do
-  @results = []
   @searched_word = params[:query]
   if @searched_word
-    @chp_titles.each_with_index do |title, idx|
-      @results << title if File.read("data/chp#{idx + 1}.txt").include? @searched_word
-    end
+    @results = find_term @searched_word
   end
   erb :search
 end
