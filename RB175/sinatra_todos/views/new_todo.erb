@@ -1,15 +1,20 @@
-<section  id="todos">
+<section id="todos" class="<%= 'complete' if all_completed? @list %>">
   <header>
     <h2><%= @list_name %></h2>
     <ul>
-      <li><a class="edit" href="#">Edit List</a></li>
+      <li>
+        <form action="/lists/<%= @list_id %>/complete" method="post">
+          <button class="check" type="submit">Complete All</button>
+        </form>
+      </li>
+      <li> <a class="edit" href="/lists/<%= @list_id %>/edit">Edit List</a></li>
     </ul>
   </header>
     <% if @todos %>
       <ul >
         <% @todos.each_with_index do |todo, idx| %>
-          <li>
-            <form action="" method="post" class="check">
+          <li class="<%= 'complete' if todo[:completed] %>">
+            <form action="/lists/<%= @list_id %>/complete/<%= idx %>" method="post" class="check">
                <input type="hidden" name="completed" value="" />
                <button type="submit">Complete</button>
             </form>
