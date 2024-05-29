@@ -1,6 +1,6 @@
 <ul id="lists">
-  <% @lists.each_with_index do |list, idx| %>
-    <li class="<%= 'complete' if all_completed? list %>">
+  <% each_list_arranged(@lists) do |list, idx| %>
+    <li class="<%= 'complete' if mark? list %>">
       <b>
         <a href="/lists/<%= idx %>">
           <h2><%= list[:name] %></h2>

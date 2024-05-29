@@ -1,6 +1,6 @@
-<section id="todos" class="<%= 'complete' if all_completed? @list %>">
+<section id="todos" class="<%= 'complete' if mark? @list %>">
   <header>
-    <h2><%= @list_name %></h2>
+    <h2><%= @list[:name] %></h2>
     <ul>
       <li>
         <form action="/lists/<%= @list_id %>/complete" method="post">
@@ -10,9 +10,9 @@
       <li> <a class="edit" href="/lists/<%= @list_id %>/edit">Edit List</a></li>
     </ul>
   </header>
-    <% if @todos %>
+    <% if @list[:todos] %>
       <ul >
-        <% @todos.each_with_index do |todo, idx| %>
+        <% each_todo_arranged(@list[:todos]) do |todo, idx| %>
           <li class="<%= 'complete' if todo[:completed] %>">
             <form action="/lists/<%= @list_id %>/complete/<%= idx %>" method="post" class="check">
                <input type="hidden" name="completed" value="" />

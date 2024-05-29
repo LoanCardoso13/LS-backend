@@ -25,9 +25,24 @@ before do
   session[:lists] ||= []
 end
 
-# Redirect to Main Page
-get "/" do
-  redirect "/lists"
+helpers do
+  def each_todo_arranged(todos)
+    todos.each_with_index do |todo, idx|
+      yield todo, idx if !todo[:completed]
+    end
+    todos.each_with_index do |todo, idx|
+      yield todo, idx if todo[:completed]
+    end
+  end
+
+  def each_list_arranged(lists)
+    lists.each_with_index do |list, idx|
+      yield list, idx if !mark?(list)
+    end
+    lists.each_with_index do |list, idx|
+      yield list, idx if mark?(list)
+    end
+  end
 end
 
 def todos_completed_ratio(list)
@@ -42,6 +57,19 @@ end
 
 def all_completed?(list)
   list[:todos].all? { |todo| todo[:completed] }
+end
+
+def mark?(list)
+  all_completed?(list) && !list[:todos].empty?
+end
+
+def valid?(name)
+  name.strip.size > 1 && name.strip.size < 100
+end
+
+# Redirect to Main Page
+get "/" do
+  redirect "/lists"
 end
 
 # Main Page, has
@@ -67,9 +95,15 @@ end
 #
 # Redirect to Main Page
 post "/lists/new" do
-  session[:lists] << { name: params[:list_name], todos: [] }
-
-  redirect "/"
+  @list_name = params[:list_name]
+  if valid? @list_name
+    session[:lists] << { name: @list_name, todos: [] }
+    session[:success] = "The list has been created."
+    redirect "/"
+  else
+    session[:error] = "List name must be between 1 and 100 characters"
+    erb :new_list
+  end
 end
 
 # List Page, has
@@ -85,8 +119,6 @@ end
 get "/lists/:list_id" do |id|
   @list_id = id.to_i
   @list = session[:lists][@list_id]
-  @list_name = session[:lists][@list_id][:name]
-  @todos = session[:lists][@list_id][:todos]
 
   erb :new_todo
 end
@@ -96,9 +128,16 @@ end
 # Redirect to List Page
 post "/lists/:list_id" do |id|
   @list_id = id.to_i
-  session[:lists][@list_id][:todos] << { name: params[:todo_name], completed: false }
-
-  redirect "/lists/#{@list_id}"
+  @list = session[:lists][@list_id]
+  @todo_name = params[:todo_name]
+  if valid? @todo_name
+    session[:lists][@list_id][:todos] << { name: @todo_name, completed: false }
+    session[:success] = "The todo was added."
+    redirect "/lists/#{@list_id}"
+  else
+    session[:error] = "Todo must be between 1 and 100 characters long."
+    erb :new_todo
+  end
 end
 
 # Route to mark all todos as completed in database
@@ -109,6 +148,7 @@ post "/lists/:list_id/complete" do |id|
   session[:lists][@list_id][:todos].each_with_index do |todo, idx|
     toggle_completed @list_id, idx unless todo[:completed]
   end
+  session[:success] = "All todos have been completed."
   
   redirect "/lists/#{@list_id}"
 end
@@ -131,6 +171,7 @@ post "/lists/:list_id/complete/:todo_id" do
   @todo_id = params[:todo_id].to_i
   @list_id = params[:list_id].to_i
   toggle_completed @list_id, @todo_id
+  session[:success] = "The todo has been updated."
   
   redirect "/lists/#{@list_id}"
 end
@@ -152,9 +193,15 @@ end
 # Redirect to List Page
 post "/lists/:list_id/edit" do |id|
   @list_id = id.to_i
-  session[:lists][@list_id][:name] = params[:list_name]
-  
-  redirect "/lists/#{@list_id}"
+  @list_name = params[:list_name]
+  if valid? @list_name
+    session[:lists][@list_id][:name] = @list_name
+    session[:success] = "The list has been updated."
+    redirect "/lists/#{@list_id}"
+  else
+    session[:error] = "List name must be between 1 and 100 characters."
+    erb :edit_list
+  end
 end
 
 # Route to delete list from database
