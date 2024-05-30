@@ -34,7 +34,7 @@
       <label for="todo_name">Enter a new todo item:</label>
     </dt>
     <dd>
-      <input name="todo_name" placeholder="Todo Name" type="text" value="" \>
+      <input name="todo_name" placeholder="Something to do" type="text" value="<%= @todo_name if session[:error] %>" \>
     </dd>
   </dl>
   <fieldset class="actions">

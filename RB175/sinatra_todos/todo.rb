@@ -67,6 +67,10 @@ def valid?(name)
   name.strip.size > 1 && name.strip.size < 100
 end
 
+def used?(list_name, lists)
+  lists.map { |list| list[:name] }.include? list_name
+end
+
 # Redirect to Main Page
 get "/" do
   redirect "/lists"
@@ -96,10 +100,13 @@ end
 # Redirect to Main Page
 post "/lists/new" do
   @list_name = params[:list_name]
-  if valid? @list_name
+  if valid?(@list_name) && !used?(@list_name, session[:lists]) 
     session[:lists] << { name: @list_name, todos: [] }
     session[:success] = "The list has been created."
     redirect "/"
+  elsif used?(@list_name, session[:lists]) 
+    session[:error] = "List name must be unique."
+    erb :new_list
   else
     session[:error] = "List name must be between 1 and 100 characters"
     erb :new_list
@@ -118,6 +125,10 @@ end
 # Form to create new todo
 get "/lists/:list_id" do |id|
   @list_id = id.to_i
+  unless session[:lists][@list_id]
+    session[:error] = "The specified list was not found."
+    redirect "/lists"
+  end
   @list = session[:lists][@list_id]
 
   erb :new_todo
@@ -130,7 +141,7 @@ post "/lists/:list_id" do |id|
   @list_id = id.to_i
   @list = session[:lists][@list_id]
   @todo_name = params[:todo_name]
-  if valid? @todo_name
+  if valid?(@todo_name) 
     session[:lists][@list_id][:todos] << { name: @todo_name, completed: false }
     session[:success] = "The todo was added."
     redirect "/lists/#{@list_id}"
@@ -160,6 +171,7 @@ post "/lists/:list_id/delete/:todo_id" do
   @todo_id = params[:todo_id].to_i
   @list_id = params[:list_id].to_i
   session[:lists][@list_id][:todos].delete_at @todo_id
+  session[:success] = "The todo has been deleted."
 
   redirect "/lists/#{@list_id}"
 end
@@ -194,10 +206,13 @@ end
 post "/lists/:list_id/edit" do |id|
   @list_id = id.to_i
   @list_name = params[:list_name]
-  if valid? @list_name
+  if valid?(@list_name) && !used?(@list_name, session[:lists])
     session[:lists][@list_id][:name] = @list_name
     session[:success] = "The list has been updated."
     redirect "/lists/#{@list_id}"
+  elsif used?(@list_name, session[:lists]) 
+    session[:error] = "List name must be unique."
+    erb :edit_list
   else
     session[:error] = "List name must be between 1 and 100 characters."
     erb :edit_list
