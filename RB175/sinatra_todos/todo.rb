@@ -27,20 +27,20 @@ end
 
 helpers do
   def each_todo_arranged(todos)
-    todos.each_with_index do |todo, idx|
-      yield todo, idx if !todo[:completed]
+    todos.each do |todo|
+      yield todo if !todo[:completed]
     end
-    todos.each_with_index do |todo, idx|
-      yield todo, idx if todo[:completed]
+    todos.each do |todo|
+      yield todo if todo[:completed]
     end
   end
 
   def each_list_arranged(lists)
-    lists.each_with_index do |list, idx|
-      yield list, idx if !mark?(list)
+    lists.each do |list|
+      yield list if !mark?(list)
     end
-    lists.each_with_index do |list, idx|
-      yield list, idx if mark?(list)
+    lists.each_with_index do |list|
+      yield list if mark?(list)
     end
   end
 end
@@ -52,7 +52,10 @@ def todos_completed_ratio(list)
 end
 
 def toggle_completed(list_id, todo_id)
-  session[:lists][list_id][:todos][todo_id][:completed] = session[:lists][list_id][:todos][todo_id][:completed] ? false : true
+  list = fetch_list list_id
+  idx = list[:todos].find_index { |todo| todo[:id] == todo_id }
+  new_completed_state = list[:todos][idx][:completed] ? false : true
+  list[:todos][idx][:completed] = new_completed_state
 end
 
 def all_completed?(list)
@@ -71,9 +74,13 @@ def used?(list_name, lists)
   lists.map { |list| list[:name] }.include? list_name
 end
 
-def next_id_from(todos)
-  max = todos.map { |todo| todo[:id] }.max || 0
+def next_id_from(hashes)
+  max = hashes.map { |hash| hash[:id] }.max || 0
   max + 1
+end
+
+def fetch_list(list_id)
+  session[:lists].find { |list| list[:id] == list_id }
 end
 
 # Redirect to Main Page
@@ -106,7 +113,7 @@ end
 post "/lists/new" do
   @list_name = params[:list_name]
   if valid?(@list_name) && !used?(@list_name, session[:lists]) 
-    session[:lists] << { name: @list_name, todos: [] }
+    session[:lists] << { id: next_id_from(session[:lists]), name: @list_name, todos: [] }
     session[:success] = "The list has been created."
     redirect "/"
   elsif used?(@list_name, session[:lists]) 
@@ -130,11 +137,11 @@ end
 # Form to create new todo
 get "/lists/:list_id" do |id|
   @list_id = id.to_i
-  unless session[:lists][@list_id]
+  unless fetch_list @list_id
     session[:error] = "The specified list was not found."
     redirect "/lists"
   end
-  @list = session[:lists][@list_id]
+  @list = fetch_list @list_id
 
   erb :new_todo
 end
@@ -144,11 +151,12 @@ end
 # Redirect to List Page
 post "/lists/:list_id" do |id|
   @list_id = id.to_i
-  @list = session[:lists][@list_id]
+  @list = fetch_list @list_id
+
   @todo_id = next_id_from @list[:todos]
   @todo_name = params[:todo_name]
   if valid?(@todo_name) 
-    session[:lists][@list_id][:todos] << { id: @todo_id, name: @todo_name, completed: false }
+    @list[:todos] << { id: @todo_id, name: @todo_name, completed: false }
     session[:success] = "The todo was added."
     redirect "/lists/#{@list_id}"
   else
@@ -162,8 +170,10 @@ end
 # Redirect to List Page
 post "/lists/:list_id/complete" do |id|
   @list_id = id.to_i
-  session[:lists][@list_id][:todos].each_with_index do |todo, idx|
-    toggle_completed @list_id, idx unless todo[:completed]
+  @list = fetch_list @list_id
+
+  @list[:todos].each do |todo|
+    todo[:completed] = true unless todo[:completed]
   end
   session[:success] = "All todos have been completed."
   
@@ -176,7 +186,9 @@ end
 post "/lists/:list_id/delete/:todo_id" do
   @todo_id = params[:todo_id].to_i
   @list_id = params[:list_id].to_i
-  session[:lists][@list_id][:todos].delete_at @todo_id
+  @list = fetch_list @list_id
+
+  @list[:todos].reject! { |todo| todo[:id] == @todo_id }
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     status 204
   else
@@ -204,7 +216,9 @@ end
 # Form to edit list name
 get "/lists/:list_id/edit" do |id|
   @list_id = id.to_i
-  @list_name = session[:lists][@list_id][:name]
+  @list = fetch_list @list_id
+
+  @list_name = @list[:name]
   
   erb :edit_list
 end
@@ -214,9 +228,11 @@ end
 # Redirect to List Page
 post "/lists/:list_id/edit" do |id|
   @list_id = id.to_i
+  @list = fetch_list @list_id
+
   @list_name = params[:list_name]
   if valid?(@list_name) && !used?(@list_name, session[:lists])
-    session[:lists][@list_id][:name] = @list_name
+    @list[:name] = @list_name
     session[:success] = "The list has been updated."
     redirect "/lists/#{@list_id}"
   elsif used?(@list_name, session[:lists]) 
@@ -233,7 +249,9 @@ end
 # Redirect to Main Page
 post "/lists/:list_id/delete" do |id|
   @list_id = id.to_i
-  session[:lists].delete_at @list_id
+  @list = fetch_list @list_id
+
+  session[:lists].reject! { |list| list[:id] == @list_id }
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     "/lists"
   else
