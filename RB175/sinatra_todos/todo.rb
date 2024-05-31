@@ -71,6 +71,11 @@ def used?(list_name, lists)
   lists.map { |list| list[:name] }.include? list_name
 end
 
+def next_id_from(todos)
+  max = todos.map { |todo| todo[:id] }.max || 0
+  max + 1
+end
+
 # Redirect to Main Page
 get "/" do
   redirect "/lists"
@@ -140,9 +145,10 @@ end
 post "/lists/:list_id" do |id|
   @list_id = id.to_i
   @list = session[:lists][@list_id]
+  @todo_id = next_id_from @list[:todos]
   @todo_name = params[:todo_name]
   if valid?(@todo_name) 
-    session[:lists][@list_id][:todos] << { name: @todo_name, completed: false }
+    session[:lists][@list_id][:todos] << { id: @todo_id, name: @todo_name, completed: false }
     session[:success] = "The todo was added."
     redirect "/lists/#{@list_id}"
   else
@@ -171,9 +177,12 @@ post "/lists/:list_id/delete/:todo_id" do
   @todo_id = params[:todo_id].to_i
   @list_id = params[:list_id].to_i
   session[:lists][@list_id][:todos].delete_at @todo_id
-  session[:success] = "The todo has been deleted."
-
-  redirect "/lists/#{@list_id}"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    status 204
+  else
+    session[:success] = "The todo has been deleted."
+    redirect "/lists/#{@list_id}"
+  end
 end
 
 # Route to toggle todo complete mark in database
@@ -225,6 +234,10 @@ end
 post "/lists/:list_id/delete" do |id|
   @list_id = id.to_i
   session[:lists].delete_at @list_id
-  
-  redirect "/lists"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:success] = "The list has been deleted"
+    redirect "/lists"
+  end
 end

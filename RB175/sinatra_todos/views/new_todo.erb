@@ -12,14 +12,14 @@
   </header>
     <% if @list[:todos] %>
       <ul >
-        <% each_todo_arranged(@list[:todos]) do |todo, idx| %>
+        <% each_todo_arranged(@list[:todos]) do |todo| %>
           <li class="<%= 'complete' if todo[:completed] %>">
-            <form action="/lists/<%= @list_id %>/complete/<%= idx %>" method="post" class="check">
+            <form action="/lists/<%= @list_id %>/complete/<%= todo[:id] %>" method="post" class="check">
                <input type="hidden" name="completed" value="" />
                <button type="submit">Complete</button>
             </form>
             <h3><%= todo[:name] %></h3>
-            <form action="/lists/<%= @list_id %>/delete/<%= idx %>" method="post" class="delete">
+            <form action="/lists/<%= @list_id %>/delete/<%= todo[:id] %>" method="post" class="delete">
               <button type="submit">Delete</button>
             </form>
           </li>
