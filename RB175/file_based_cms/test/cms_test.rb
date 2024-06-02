@@ -13,6 +13,10 @@ class AppTest < Minitest::Test
     Sinatra::Application
   end
 
+  def session
+    last_request.env["rack.session"]
+  end
+
   def create_document(name, content = "")
     File.open(File.join(data_path, name), "w") do |file|
       file.write(content)
@@ -35,7 +39,7 @@ class AppTest < Minitest::Test
   end
 
   def test_index
-    get "/"
+    get "/", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
     assert_includes last_response.body, "about.md"
@@ -44,49 +48,38 @@ class AppTest < Minitest::Test
   end
 
   def test_content
-    get "/changes.txt"
+    get "/changes.txt", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_equal "text/plain", last_response["Content-Type"]
     assert_includes last_response.body, "Ruby 2.0 released."
   end
 
   def test_not_found
-    get "/ubauba.txt"
+    get "/ubauba.txt", {}, { "rack.session" => {user: "admin"}}
     assert_equal 302, last_response.status
-    redirection = last_response["location"]
+    assert_equal "ubauba.txt does not exist.", session[:message]
 
-    get redirection
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "ubauba.txt does not exist."
-
-    get redirection
-    assert_equal 200, last_response.status
-    refute_includes last_response.body, "ubauba.txt does not exist."
+    get "/"
+    refute_equal "ubauba.txt does not exist.", session[:message]
   end
 
   def test_render_markdown
-    get "/about.md"
+    get "/about.md", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<h1>"
     refute_includes last_response.body, "#"
   end
 
   def test_edit
-    get "/history.txt/edit"    
+    get "/history.txt/edit", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<textarea"
 
     post "/history.txt/edit", content: "Added content for testing."
     assert_equal 302, last_response.status
-
-    redirection = last_response["location"]
-    get redirection
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "history.txt has been updated."
-
-    get redirection
-    assert_equal 200, last_response.status
-    refute_includes last_response.body, "history.txt has been updated."
+    assert_equal "history.txt has been updated.", session[:message]
+    get last_response["location"]
+    refute_equal "history.txt has been updated.", session[:message]
 
     get "/history.txt"
     assert_equal 200, last_response.status
@@ -94,24 +87,26 @@ class AppTest < Minitest::Test
   end
 
   def test_create
-    get "/new"
+    get "/new", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<button" 
 
     post "/new", add: 'dummy.txt'
     assert_equal 302, last_response.status
+    assert_equal "dummy.txt was created.", session[:message]
 
     get last_response["location"]
     assert_equal 200, last_response.status
+    refute_equal "dummy.txt was created", session[:message]
     assert_includes last_response.body, "dummy.txt" 
-    assert_includes last_response.body, "dummy.txt was created" 
 
     post "/new", add: '   '
-    assert_includes last_response.body, "A name is required." 
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "A name is required."
   end
 
   def test_delete
-    get "/"
+    get "/", {}, { "rack.session" => {user: "admin"}}
     assert_equal 200, last_response.status
     assert_includes last_response.body, ">Delete<"
     assert_includes last_response.body, "history.txt"
@@ -150,7 +145,7 @@ class AppTest < Minitest::Test
   end
 
   def test_signin_with_bad_credentials
-    post "/users/signin", username: "guest", password: "shhhh"
+    post "/users/signin", {username: "guest", password: "shhhh"}
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid credentials"
   end

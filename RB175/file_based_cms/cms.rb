@@ -22,7 +22,7 @@ configure do
 end
 
 get "/" do
-  if session[:user]
+  if session[:user] == "admin"
     @files_array = Dir.glob(data_path + '/*').map { |path| File.basename(path) }
 
     erb :index
@@ -42,6 +42,7 @@ post "/users/signin" do
     redirect "/"
   else
     session[:message] = "Invalid credentials"
+    status 422
     erb :signin
   end
 end
@@ -64,6 +65,7 @@ post "/new" do
     redirect "/"
   else
     session[:message] = "A name is required."
+    status 422
     erb :new_file
   end
 end
