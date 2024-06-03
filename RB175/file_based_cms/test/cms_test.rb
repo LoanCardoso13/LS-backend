@@ -1,165 +1,156 @@
+# rubocop:disable all
 ENV["RACK_ENV"] = "test"
+
+require "fileutils"
 
 require "minitest/autorun"
 require "rack/test"
-require "fileutils"
 
 require_relative "../cms"
 
-class AppTest < Minitest::Test
+class CMSTest < Minitest::Test
+
   include Rack::Test::Methods
 
   def app
     Sinatra::Application
   end
 
-  def session
-    last_request.env["rack.session"]
-  end
-
-  def create_document(name, content = "")
-    File.open(File.join(data_path, name), "w") do |file|
-      file.write(content)
-    end
-  end
-
   def setup
-    root = File.expand_path("../../data", __FILE__)
-    content1 = File.read(root + '/about.md')
-    content2 = File.read(root + '/changes.txt')
-    content3 = File.read(root + '/history.txt')
     FileUtils.mkdir_p(data_path)
-    create_document "about.md", content1
-    create_document "changes.txt", content2
-    create_document "history.txt", content3
+    create_document "about.md", File.read('./data/about.md')
+    create_document "changes.txt", File.read('./data/changes.txt')
+    create_document "history.txt", File.read('./data/history.txt')
   end
 
   def teardown
     FileUtils.rm_rf(data_path)
   end
 
+  def session
+    last_request.env["rack.session"]
+  end
+
+  def admin_session
+    { "rack.session" => { signin: true } }
+  end
+
   def test_index
-    get "/", {}, { "rack.session" => {user: "admin"}}
+    pattern = File.join(data_path, '*')
+    list = Dir.glob(pattern).map { |item| File.basename(item) }
+
+    get "/"
     assert_equal 200, last_response.status
-    assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
-    assert_includes last_response.body, "about.md"
-    assert_includes last_response.body, "changes.txt"
-    assert_includes last_response.body, "history.txt"
+    list.each do |filename|
+      assert_includes(last_response.body, filename)
+    end
   end
 
   def test_content
-    get "/changes.txt", {}, { "rack.session" => {user: "admin"}}
+    file_path = File.join(data_path, 'history.txt')
+    content = File.read(file_path)
+
+    get "/history.txt/view"
     assert_equal 200, last_response.status
     assert_equal "text/plain", last_response["Content-Type"]
-    assert_includes last_response.body, "Ruby 2.0 released."
+    assert_equal content, last_response.body
   end
 
-  def test_not_found
-    get "/ubauba.txt", {}, { "rack.session" => {user: "admin"}}
+  def test_document_not_found
+    wrong_name = 'somefile.ext'
+
+    get "/#{wrong_name}/view"
+
     assert_equal 302, last_response.status
-    assert_equal "ubauba.txt does not exist.", session[:message]
+    assert_equal 'somefile.ext does not exist.', session[:message]
+    get "/"
+    refute_equal 'somefile.ext does not exist.', session[:message]
+  end
+
+  def test_rendering_markdown
+    get "/about.md"
+
+    refute_includes last_response.body, '#'
+  end
+
+  def test_editing_text
+    create_document 'dummy.txt', 'initial text'
+    file_path = File.join(data_path, 'dummy.txt')
+
+    assert_equal 'initial text', File.read(file_path)
+
+    post "/dummy.txt/edit", {:changes => 'final text'}, admin_session
+    assert_equal 302, last_response.status
+
+    assert_equal "dummy.txt has been updated.", session[:message]
+    get last_response["Location"]
+    refute_equal "dummy.txt has been updated.", session[:message]
+
+    assert_equal 'final text', File.read(file_path)
+
+    File.delete(file_path)
+  end
+
+  def test_adding_file
+    get "/new"
+    assert_equal 200, last_response.status
+
+    post "/new_file", {filename: "new_file.txt"}, admin_session
+    assert_equal 302, last_response.status
+
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "new_file.txt"
+    assert_includes last_response.body, %q(<a href="/new">New Document</a>)
+  end
+
+  def test_empty_filename
+    post "/new_file", {filename: ""}, admin_session
+    assert_equal 302, last_response.status
+
+    assert_equal "A name is required.", session[:message]
+    get last_response["Location"]
+    refute_equal "A name is required.", session[:message]
+  end
+
+  def test_delete_file
+    create_document 'a_file.txt'
 
     get "/"
-    refute_equal "ubauba.txt does not exist.", session[:message]
-  end
+    assert_includes last_response.body, 'a_file.txt'
 
-  def test_render_markdown
-    get "/about.md", {}, { "rack.session" => {user: "admin"}}
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "<h1>"
-    refute_includes last_response.body, "#"
-  end
-
-  def test_edit
-    get "/history.txt/edit", {}, { "rack.session" => {user: "admin"}}
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "<textarea"
-
-    post "/history.txt/edit", content: "Added content for testing."
+    post '/a_file.txt/delete', {}, admin_session
     assert_equal 302, last_response.status
-    assert_equal "history.txt has been updated.", session[:message]
-    get last_response["location"]
-    refute_equal "history.txt has been updated.", session[:message]
+    
+    assert_equal 'a_file.txt has been deleted.', session[:message]
+    get last_response["Location"]
+    refute_equal 'a_file.txt has been deleted.', session[:message]
 
-    get "/history.txt"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "Added content for testing." 
-  end
+    get "/"
 
-  def test_create
-    get "/new", {}, { "rack.session" => {user: "admin"}}
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "<button" 
-
-    post "/new", add: 'dummy.txt'
-    assert_equal 302, last_response.status
-    assert_equal "dummy.txt was created.", session[:message]
-
-    get last_response["location"]
-    assert_equal 200, last_response.status
-    refute_equal "dummy.txt was created", session[:message]
-    assert_includes last_response.body, "dummy.txt" 
-
-    post "/new", add: '   '
-    assert_equal 422, last_response.status
-    assert_includes last_response.body, "A name is required."
-  end
-
-  def test_delete
-    get "/", {}, { "rack.session" => {user: "admin"}}
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, ">Delete<"
-    assert_includes last_response.body, "history.txt"
-    assert_includes last_response.body, "about.md"
-
-    post "/history.txt/delete"
-    assert_equal 302, last_response.status
-
-    redirection = last_response["location"]
-    get redirection
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "history.txt has been deleted."
-    assert_includes last_response.body, "about.md"
-
-    get redirection
-    assert_equal 200, last_response.status
-    refute_includes last_response.body, "history.txt has been deleted."
-    assert_includes last_response.body, "about.md"
-  end
-
-  def test_signin_form
-    get "/users/signin"
-
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "<input"
-    assert_includes last_response.body, %q(<button type="submit")
+    refute_includes last_response.body, 'a_file.txt'
   end
 
   def test_signin
-    post "/users/signin", username: "admin", password: "secret"
+    get "/", {}, admin_session
+    assert_equal 200, last_response.status
+
+    assert_includes last_response.body, 'Sign Out'
+
+    post "/signout"
     assert_equal 302, last_response.status
 
     get last_response["Location"]
-    assert_includes last_response.body, "Welcome"
-    assert_includes last_response.body, "Signed in as admin"
+    assert_includes last_response.body, 'Sign In'
   end
 
-  def test_signin_with_bad_credentials
-    post "/users/signin", {username: "guest", password: "shhhh"}
-    assert_equal 422, last_response.status
-    assert_includes last_response.body, "Invalid credentials"
-  end
+  def test_wrong_credentials
+    post "/signout"
 
-  def test_signout
-    post "/users/signin", username: "admin", password: "secret"
-    get last_response["Location"]
-    assert_includes last_response.body, "Welcome"
-
-    post "/users/signout"
-    get last_response["Location"]
-
-    assert_includes last_response.body, "You have been signed out"
-    assert_includes last_response.body, "Sign In"
+    post "/signin", user: "nobody", password: "no"
+    assert_equal 302, last_response.status
+    assert_equal 'Invalid Credentials', session[:message]
   end
 
 end

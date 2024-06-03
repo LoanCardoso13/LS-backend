@@ -1,25 +1,21 @@
-<% @files_array.each do |file| %>
-  <li>
-    <a href="/<%= file %>"><%= file %></a> 
-    <a href="/<%= file %>/edit">Edit</a>   
-    <form class="inline" method="post" action="/<%= file %>/delete"><button type="submit">Delete</button></form>
-  </li>
+<% if session[:message] %>
+  <p class="message"><%= session.delete(:message) %></p>
 <% end %>
 
-<br/>
-<a href="/new">New Document</a>
-<br/>
-<br/>
-<% if session[:user] %>
-  <div>
-    <form action="/users/signout" method="post">
-      <em>Signed in as <%= session[:user] %>.</em> <button type="submit">Sign Out</button>
-    </form>
-  </div>
-<% else %>
-  <div>
-    <form action="/users/signin" method="get">
-      <em>You are signed out.</em> <button type="submit">Sign In</button>
-    </form>
-  </div>
+<% if session[:message] %>
+  <p class="message"><%= session.delete(:message) %></p>
 <% end %>
+
+<ul>
+  <% @list.each do |item| %>
+    <li>
+      <a href="/<%= item %>/view"><%= item %></a>  
+      <a href="/<%= item %>/edit">Edit</a>  
+      <form class="inline" method="post" action="/<%= item %>/delete">
+        <button type="submit">delete</button>
+      </form>
+    </li>
+  <% end %>
+</ul>
+
+<a href="/new">New Document</a>

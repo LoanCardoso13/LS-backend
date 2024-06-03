@@ -1,11 +1,13 @@
-<form action="/users/signin" method="post">
-  <div>
-    <label for="username">Username:</label>
-    <input name="username" value="<%= params[:username] %>"/>
-  </div>
-  <div>
-    <label for="password">Password:</label>
-    <input name="password" value="<%= params[:password] %>"/>
-  </div>
+<% if session[:message] %>
+  <p class="message"><%= session.delete(:message) %></p>
+<% end %>
+
+<form action="/signin" method="post">
+  <label>Username: </label>
+  <textarea name="user" rows="1" cols="13"></textarea>
+  <br/>
+  <label>Password: </label>
+  <textarea name="password" rows="1" cols="13"></textarea>
+  <br/>
   <button type="submit">Sign In</button>
 </form>

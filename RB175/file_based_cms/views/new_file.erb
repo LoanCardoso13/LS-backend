@@ -1,5 +1,10 @@
-<form action="/new" method="post">
-  <div><label for="add">Add a new document:</label></div>
-  <input name="add"/>
-  <button type="submit">Create</button>
+<% if session[:message] %>
+  <p class="message"><%= session.delete(:message) %></p>
+<% end %>
+
+<p>Add a new document:</p>
+
+<form action="/new_file" method="post">
+  <textarea name="filename" rows="1" cols="26"></textarea>
+  <input type="submit" value="Create"/>
 </form>

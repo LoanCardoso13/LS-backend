@@ -2,13 +2,21 @@
 <html lang="en">
   <head>
     <title>CMS</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="/cms.css" />
+    <link rel="stylesheet" href="/stylesheets/cms.css">
   </head>
   <body>
-    <% if session[:message] %>
-      <p class="message"><%= session.delete(:message) %></p>
-    <% end %>
     <%= yield %>
+
+    <% if session[:signin] %>
+      <form action="/signout" method="post">
+        <em>Signed in as <%= session[:user] %></em>
+        <button type="submit">Sign Out</button>
+      </form>
+    <% else %>
+      <form action="/users/signin" method="get">
+        <em>You are signed out</em>
+        <button type="submit">Sign In</button>
+      </form>
+    <% end %>
   </body>
 </html>
