@@ -1,4 +1,4 @@
-DATABASE_NAME=ground
+DATABASE_NAME=generic
 SQL_FILE_PATH=$1
 
 dropdb $DATABASE_NAME
