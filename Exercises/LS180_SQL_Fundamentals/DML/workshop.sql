@@ -10,6 +10,7 @@ CREATE TABLE parts (
   part_number integer UNIQUE NOT NULL,
   device_id integer REFERENCES devices(id)
 );
+--- DDL above
 
 INSERT INTO devices
 (name)

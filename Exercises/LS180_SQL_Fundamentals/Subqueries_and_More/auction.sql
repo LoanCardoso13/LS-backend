@@ -46,6 +46,7 @@ GROUP BY bidder_id) AS bids_per_bidder;
 
 SELECT name, (SELECT count(bids.id) FROM bids WHERE item_id = items.id) FROM items;
 
+--- JOIN equivalent:
 SELECT name, count(bids.id) FROM items
 LEFT JOIN bids ON items.id = item_id
 GROUP BY name;
