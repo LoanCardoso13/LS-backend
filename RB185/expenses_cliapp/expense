@@ -1,0 +1,106 @@
+#! /usr/bin/env ruby
+
+require "pg"
+
+class ExpanseData
+  def initialize
+    @connection = PG.connect(dbname: "expenses_cliapp")
+    res = @connection.exec("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'expenses'")
+    if res[0]["count"] == "0"
+      sql = File.read('schema.sql')
+      @connection.exec(sql)
+    end
+  end
+
+  def list(result = nil)
+    result ||= @connection.exec('SELECT * FROM expenses ORDER BY created_on')
+    n_of_expenses = result.ntuples
+
+    if n_of_expenses > 0
+      listing_header = n_of_expenses > 1 ? "There are #{n_of_expenses} expenses." : "There is 1 expense."
+      puts listing_header
+      total = @connection.exec('SELECT sum(amount) FROM expenses')
+      result.each do |row|
+        puts " #{row["id"]} | #{row["created_on"]} |#{row["amount"].rjust(11,' ')}| #{row["memo"]}"
+      end
+      puts "-"*50
+      puts "Total                  #{total[0]["sum"]}"
+    else
+      puts "There are no expenses."
+    end
+  end
+
+  def add(price, item)
+    @connection.exec_params("INSERT INTO expenses
+            (amount, memo, created_on)
+            VALUES ($1, $2, NOW())", [price, item])
+  end
+
+  def search(searched_item)
+    result = @connection.exec_params('SELECT * FROM expenses WHERE memo ILIKE $1', ["%#{searched_item}%"])
+    list result
+  end
+
+  def delete(deleted_id)
+    deleted_one = @connection.exec_params('SELECT * FROM expenses WHERE id = $1', [deleted_id])
+    if deleted_one.values.empty?
+      puts "There is no expense with the id '#{deleted_id}'"
+    else
+      @connection.exec_params('DELETE FROM expenses WHERE id = $1', [deleted_id])
+      puts "The following expense has been deleted:"
+      deleted_one.each do |row|
+        puts " #{row["id"]} | #{row["created_on"]} |#{row["amount"].rjust(11,' ')}| #{row["memo"]}"
+      end
+    end
+  end
+
+  def clear
+    @connection.exec('DELETE FROM expenses')
+    puts "All expenses have been deleted."
+  end
+end
+
+class CLI
+  def initialize
+    @expense_data = ExpanseData.new
+  end
+
+  def run(args)
+    if args[0] == 'list'
+      @expense_data.list
+    elsif args[0] == 'add'
+      if !args[1] || !args[2]
+        puts "You must provide an amount and memo."
+      else
+        @expense_data.add(args[1], args[2])
+      end
+    elsif args[0] == 'search'
+      @expense_data.search(args[1])
+    elsif args[0] == 'delete'
+      @expense_data.delete(args[1])
+    elsif args[0] == 'clear'
+      @expense_data.clear if confirmed?
+    else
+      help
+    end
+  end
+
+  def help
+    puts "An expense recording system
+
+    Commands:
+
+    add AMOUNT MEMO - record a new expense
+    clear - delete all expenses
+    list - list all expenses
+    delete NUMBER - remove expense with id NUMBER
+    search QUERY - list expenses with a matching memo field"
+  end
+
+  def confirmed?
+    puts "This will remove all expenses. Are you sure? (y/n)"
+    STDIN.gets.chomp.start_with? 'y'
+  end
+end
+
+CLI.new.run ARGV
